@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.MyPost.MyPostFragment"
+    android:background="@color/general_color"
+    >
+
+    <TextView
+        android:id="@+id/text_title"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="My Posts"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:fontFamily="@font/raleway_bold"
+        android:textSize="19sp"
+        android:textColor="#000"
+        android:background="#FFF"
+        android:elevation="2dp"
+        />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tempConstraint"
+        android:layout_marginTop="47dp"
+        >
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/myPost_recylcerView_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:nestedScrollingEnabled="true"
+            />
+
+    </RelativeLayout>
+
+</FrameLayout>

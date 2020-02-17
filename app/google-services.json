@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "528145685375",
+    "firebase_url": "https://shareden.firebaseio.com",
+    "project_id": "shareden",
+    "storage_bucket": "shareden.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:528145685375:android:2630f84341d8cd127c984a",
+        "android_client_info": {
+          "package_name": "com.deepmodi.shareden"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "528145685375-r1929r03i353isffefjt4gmussm8sb08.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.deepmodi.shareden",
+            "certificate_hash": "13336103e544bd31e3864992c361e4a486d3148d"
+          }
+        },
+        {
+          "client_id": "528145685375-tlmm632t863kgtaad1mo7iut3k0uhea9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCRHod0T45qMA_Lrd2A2AcJ65maKhkh8k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "528145685375-tlmm632t863kgtaad1mo7iut3k0uhea9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
