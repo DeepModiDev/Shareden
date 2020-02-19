@@ -2,6 +2,7 @@ package com.deepmodi.shareden.Adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -87,7 +88,10 @@ public class CreatePostRecyclerViewAdapter extends RecyclerView.Adapter<CreatePo
                 Toast.makeText(v.getContext(), ""+uiElements.get(position).isSelected(), Toast.LENGTH_SHORT).show();
                 if(uiElements.get(position).isSelected())
                 {
-                    sendImages.add(URIs.get(position));
+                    if(!sendImages.contains(URIs.get(position)))
+                    {
+                        sendImages.add(URIs.get(position));
+                    }
                 }
                 else
                 {

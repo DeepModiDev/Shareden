@@ -1,6 +1,5 @@
 package com.deepmodi.shareden.ui.MyPost;
 
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -147,6 +146,8 @@ public class MyPostFragment extends Fragment {
                                             break;
                                         case R.id.item_edit:
                                             Intent intent = new Intent(v.getContext(), UploadActivity.class);
+                                            //intent.putExtra("EditBookData",model);
+                                            //intent.putExtra("BookEnableId",true);
                                             intent.putExtra("BookUpdateName",model.getUserBookName());
                                             intent.putExtra("BookUpdateDescription",model.getUserBookDescription());
                                             intent.putExtra("BookId",model.getPostId());
@@ -184,34 +185,6 @@ public class MyPostFragment extends Fragment {
         {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        DatabaseReference.goOffline();
-        Log.d("MyAccountFragmnet : ","Database goes online on resume");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        DatabaseReference.goOffline();
-        Log.d("MyAccountFragmnet : ","Database goes offline on stop");
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        DatabaseReference.goOnline();
-        Log.d("MyAccountFragmnet : ","Database goes online in start");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        DatabaseReference.goOffline();
-        Log.d("MyAccountFragmnet : ","Database goes offline in pause");
     }
 
 }

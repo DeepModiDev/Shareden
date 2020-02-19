@@ -57,18 +57,15 @@ import io.paperdb.Paper;
 
 public class HomeActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
-    //FrameLayout frameLayout;
+    FrameLayout frameLayout;
     //private int STORAGE_PERMISSION_CODE = 123;
-    //final Fragment fragment1 = new HomeFragment();
-    //final Fragment fragment2 = new SearchFragment();
-    //final Fragment fragment3 = new MyAccountFragment();
-    //final Fragment fragment4 = new MyPostFragment();
-    //final FragmentManager fm = getSupportFragmentManager();
-    //Fragment active;
+     final  Fragment fragment1 = new HomeFragment();
+     final Fragment fragment2 = new SearchFragment();
+     final Fragment fragment3 = new MyPostFragment();
+    // final Fragment fragment4 = new EditProfile();
+    final FragmentManager fm = getSupportFragmentManager();
+    Fragment active = fragment1;
     public static final int PERMISSION_REQUEST_CODE = 101;
-    private ViewPager viewPager;
-    private BottomNavigationView navigation;
-    private MenuItem menuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,21 +89,17 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         }
 
         requestStoragePermissionUsingDexter();
-        viewPager = findViewById(R.id.viewPager);
 
-        //frameLayout = findViewById(R.id.frame_layout);
-        navigation = findViewById(R.id.bottom_navigation);
+        frameLayout = findViewById(R.id.frame_layout);
+        BottomNavigationView navigation = findViewById(R.id.bottom_navigation);
         navigation.setOnNavigationItemSelectedListener(this);
         navigation.setSelectedItemId(R.id.action_home);
 
 
-        //fm.beginTransaction().add(R.id.frame_layout,fragment4,"4").hide(fragment4).commit();
-        //fm.beginTransaction().add(R.id.frame_layout, fragment3, "3").hide(fragment3).commit();
-        //fm.beginTransaction().add(R.id.frame_layout, fragment2, "2").hide(fragment2).commit();
-        //fm.beginTransaction().add(R.id.frame_layout,fragment1, "1").commit();
-
-        SetupViewPager();
-
+       // fm.beginTransaction().add(R.id.frame_layout,fragment4,"4").hide(fragment4).commit();
+        fm.beginTransaction().add(R.id.frame_layout, fragment3, "3").hide(fragment3).commit();
+        fm.beginTransaction().add(R.id.frame_layout, fragment2, "2").hide(fragment2).commit();
+        fm.beginTransaction().add(R.id.frame_layout,fragment1, "1").commit();
     }
 
     @Override
@@ -114,27 +107,19 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
 
         switch (menuItem.getItemId()) {
             case R.id.action_home:
-                //fm.beginTransaction().hide(active).show(fragment1).commit();
-                //active = fragment1;
-                viewPager.setCurrentItem(0);
-                return false;
+                fm.beginTransaction().hide(active).show(fragment1).commit();
+                active = fragment1;
+                return true;
             case R.id.action_search:
-                //fm.beginTransaction().hide(active).show(fragment2).commit();
-                //active = fragment2;
-                viewPager.setCurrentItem(1);
-                return false;
-            case R.id.action_account:
-                //fm.beginTransaction().hide(active).show(fragment3).commit();
-                //active = fragment3;
-                viewPager.setCurrentItem(2);
-                return false;
+                fm.beginTransaction().hide(active).show(fragment2).commit();
+                active = fragment2;
+                return true;
             case R.id.action_my_post:
-                //fm.beginTransaction().hide(active).show(fragment4).commit();
-                //active = fragment4;
-                viewPager.setCurrentItem(3);
-                return false;
+                fm.beginTransaction().hide(active).show(fragment3).commit();
+                active = fragment3;
+                return true;
         }
-        return true;
+        return false;
 
     }
     /*
@@ -161,53 +146,6 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         }
     }
      */
-
-
-    private void initFragments(ViewPager viewPager)
-    {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        MyPostFragment postFragment = MyPostFragment.newInstance();
-        MyAccountFragment accountFragment = MyAccountFragment.newInstance();
-        HomeFragment homeFragment = HomeFragment.newInstance();
-        SearchFragment searchFragment = SearchFragment.newInstance();
-        adapter.addFragment(homeFragment);
-        adapter.addFragment(postFragment);
-        adapter.addFragment(searchFragment);
-        adapter.addFragment(accountFragment);
-        viewPager.setAdapter(adapter);
-       // active = postFragment;
-    }
-
-    private void SetupViewPager()
-    {
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                if(menuItem!=null)
-                {
-                    menuItem.setCheckable(false);
-                }
-                else
-                {
-                    navigation.getMenu().getItem(0).setChecked(false);
-                }
-
-                navigation.getMenu().getItem(position).setChecked(false);
-                menuItem = navigation.getMenu().getItem(position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-        initFragments(viewPager);
-    }
 
 
     private void requestStoragePermissionUsingDexter()
@@ -280,32 +218,6 @@ public class HomeActivity extends AppCompatActivity implements BottomNavigationV
         if(requestCode == PERMISSION_REQUEST_CODE && resultCode == RESULT_OK && data!=null)
         {
             Toast.makeText(this, "Permission Granted.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private class ViewPagerAdapter extends FragmentStatePagerAdapter
-    {
-        private final List<Fragment> fragments = new ArrayList<>();
-
-        public ViewPagerAdapter(FragmentManager fragmentManager)
-        {
-            super(fragmentManager);
-        }
-
-        @NonNull
-        @Override
-        public Fragment getItem(int position) {
-            return fragments.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return fragments.size();
-        }
-
-        public void addFragment(Fragment fragment)
-        {
-            fragments.add(fragment);
         }
     }
 }

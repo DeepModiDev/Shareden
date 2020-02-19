@@ -15,12 +15,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Environment;
 import android.os.FileUtils;
 import android.os.Handler;
+import android.text.Layout;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -35,7 +37,10 @@ import com.deepmodi.shareden.ActivityUserFollower;
 import com.deepmodi.shareden.ActivityUserFollowing;
 import com.deepmodi.shareden.ActivityUserRequest;
 import com.deepmodi.shareden.Adapter.HomePostImageViewAdapter;
+import com.deepmodi.shareden.EditProfile;
 import com.deepmodi.shareden.EditProfileAcivity;
+import com.deepmodi.shareden.EditUserActivity;
+import com.deepmodi.shareden.HomeActivity;
 import com.deepmodi.shareden.Interface.UploadItemClickListner;
 import com.deepmodi.shareden.R;
 import com.deepmodi.shareden.UploadActivity;
@@ -78,7 +83,8 @@ import io.paperdb.Paper;
 
 import static android.app.Activity.RESULT_OK;
 
-public class MyAccountFragment extends Fragment {
+public class MyAccountFragment extends Fragment  implements LifecycleOwner
+{
 
         private MyAccountViewModel mViewModel;
         AppBarLayout appBarLayout;
@@ -101,7 +107,6 @@ public class MyAccountFragment extends Fragment {
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.my_account_fragment, container, false);
-
         //init database
         Paper.init(view.getContext());
 
@@ -155,7 +160,7 @@ public class MyAccountFragment extends Fragment {
         profile_img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openImageChooser(v.getContext(),activity);
+                startActivity(new Intent(v.getContext(), EditUserActivity.class));
             }
         });
 
@@ -175,12 +180,7 @@ public class MyAccountFragment extends Fragment {
                 Toast.makeText(v.getContext(), "All the informations are saved.", Toast.LENGTH_LONG).show();
                 btn_save.setText("Changes Are Saved");
                 */
-                Intent intent = new Intent(getContext(),EditProfileAcivity.class);
-                intent.putExtra("userName",register.getUserName());
-                intent.putExtra("userOccupation",register.getUserLevel());
-                intent.putExtra("userPhoneNumber",register.getUserNumber());
-                intent.putExtra("userBio",register.getUserDesc());
-                startActivity(intent);
+                startActivity(new Intent(v.getContext(),EditProfileAcivity.class));
             }
         });
         return view;
@@ -243,11 +243,12 @@ public class MyAccountFragment extends Fragment {
     }
 
     private void loadUserInformation(DatabaseReference query) {
-        query.addValueEventListener(new ValueEventListener() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 register = dataSnapshot.getValue(UserRegister.class);
                try {
+                   assert register != null;
                    if(register.getUserImg()!=null)
                    {
                        Picasso.get().load(register.getUserImg()).placeholder(R.drawable.usr_img).into(profile_img);
@@ -353,36 +354,9 @@ public class MyAccountFragment extends Fragment {
                     e.printStackTrace();
                 }
                 }else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                    Exception exception = result.getError();
+                    Exception exception = Objects.requireNonNull(result).getError();
                     Toast.makeText(getActivity(), "" + exception, Toast.LENGTH_SHORT).show();
                 }
             }
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        DatabaseReference.goOffline();
-        Log.d("MyAccountFragmnet : ","Database goes online on resume");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        DatabaseReference.goOffline();
-        Log.d("MyAccountFragmnet : ","Database goes offline on stop");
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        DatabaseReference.goOnline();
-        Log.d("MyAccountFragmnet : ","Database goes online in start");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        DatabaseReference.goOffline();
-        Log.d("MyAccountFragmnet : ","Database goes offline in pause");
     }
 }

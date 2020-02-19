@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -64,28 +65,23 @@ public class EditProfileAcivity extends AppCompatActivity {
     private StorageReference referenceStorage;
     private FirebaseDatabase data_base,databaseMyPostEdit;
     private DatabaseReference referenceEdit,referenceMyPostEdit;
-    private String tempUrl;
     private UserRegister register = new UserRegister();
     private List<String> myIds = new ArrayList<>();
     private List<UserPost> post = new ArrayList<>();
+    private ProgressDialog progressDialog;
+    private UploadImageAsyncTask uploadImageAsyncTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile_acivity);
 
-        Intent intent = getIntent();
-        userName = intent.getStringExtra("userName");
-        userOccupation = intent.getStringExtra("userOccupation");
-        userPhone = intent.getStringExtra("userPhoneNumber");
-        userBio = intent.getStringExtra("userBio");
-
         //Paper init
         Paper.init(this);
 
         //firebase init
         data_base = FirebaseDatabase.getInstance();
-        referenceEdit = data_base.getReference("Users").child((String)Paper.book().read(Common.USER_FINAL_NUMBER));
+        referenceEdit = data_base.getReference("Users").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString());
 
         databaseMyPostEdit = FirebaseDatabase.getInstance();
         referenceMyPostEdit = databaseMyPostEdit.getReference("MyPost").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString());
@@ -113,11 +109,14 @@ public class EditProfileAcivity extends AppCompatActivity {
             getWindow().setStatusBarColor(ContextCompat.getColor(this,R.color.white));
         }
 
-        edit_user_name.setText(userName);
-        edit_user_phone.setText(userPhone);
+        loadUserInformation(referenceEdit);
+
+
+        edit_user_name.setText(register.getUserName());
+        edit_user_phone.setText(register.getUserNumber());
         edit_user_phone.setEnabled(false);
-        edit_user_occupation.setText(userOccupation);
-        edit_user_bio.setText(userBio);
+        edit_user_occupation.setText(register.getUserLevel());
+        edit_user_bio.setText(register.getUserDesc());
         try
         {
             Picasso.get().load(Paper.book().read(Common.USER_IMAGE_LINK).toString()).error(R.drawable.usr_img).into(profile_img);
@@ -125,8 +124,6 @@ public class EditProfileAcivity extends AppCompatActivity {
         {
             Log.e("EditProfileActivity",e.getMessage());
         }
-
-        loadUserInformation(referenceEdit);
 
         profile_img.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -195,49 +192,13 @@ public class EditProfileAcivity extends AppCompatActivity {
                             .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
                                     Environment.DIRECTORY_PICTURES).getAbsolutePath())
                             .compressToFile(finalImage);
-
                     //String resultUri = result.getUri().toString();
-
                     if (resultUri != null) {
-
-                        final ProgressDialog dialog = new ProgressDialog(EditProfileAcivity.this);
-                        dialog.setTitle("Loading...");
-                        dialog.show();
-                        final StorageReference ref = referenceStorage.child("images/" + Paper.book().read(Common.USER_FINAL_NUMBER));
-                        ref.putFile(Uri.fromFile(compressedImage))
-                                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                                        double progress = (100 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                                        dialog.setMessage("Loading : " + (float) progress + "%");
-                                        dialog.setCancelable(false);
-                                    }
-                                })
-                                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        dialog.dismiss();
-                                        ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                            @Override
-                                            public void onSuccess(Uri uri) {
-                                                tempUrl = uri.toString();
-                                                Paper.book().write(Common.USER_IMAGE_LINK,tempUrl);
-                                                register.setUserImg(tempUrl);
-                                                referenceEdit.setValue(register);
-                                                Toast.makeText(EditProfileAcivity.this, "Image uploaded successfully.", Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        dialog.dismiss();
-                                    }
-                                });
+                        progressDialog = new ProgressDialog(this);
+                        uploadImageAsyncTask = new UploadImageAsyncTask();
+                        uploadImageAsyncTask.execute(compressedImage);
                     }
-                }
-                catch(IOException e) {
+                }catch(IOException e) {
                     e.printStackTrace();
                 }
             }else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
@@ -248,7 +209,7 @@ public class EditProfileAcivity extends AppCompatActivity {
     }
 
     private void loadUserInformation(DatabaseReference query) {
-        query.addValueEventListener(new ValueEventListener() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 register = dataSnapshot.getValue(UserRegister.class);
@@ -273,7 +234,7 @@ public class EditProfileAcivity extends AppCompatActivity {
         });
     }
 
-    private void updateUserInformation(final DatabaseReference reference) {
+   /* private void updateUserInformation(final DatabaseReference reference) {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -327,7 +288,60 @@ public class EditProfileAcivity extends AppCompatActivity {
             }
         },3000);
     }
+    */
 
+    private class UploadImageAsyncTask extends AsyncTask<File,Double,String> {
+        String result;
+        double progress;
 
+        @Override
+        protected String doInBackground(File... files) {
+            final StorageReference ref = referenceStorage.child("images/" + Paper.book().read(Common.USER_FINAL_NUMBER));
+            ref.putFile(Uri.fromFile(files[0]))
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                            progress = (double) (100 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                        }
+                    })
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            progressDialog.dismiss();
+                            ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    result = uri.toString();
+                                    Paper.book().write(Common.USER_IMAGE_LINK, result);
+                                    register.setUserImg(result);
+                                    referenceEdit.setValue(register);
+                                }
+                            });
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            progressDialog.dismiss();
+                        }
+                    });
+            publishProgress(progress);
+            return result;
+        }
 
+        @Override
+        protected void onProgressUpdate(Double... values){
+            progressDialog.setTitle("Uploading...");
+            progressDialog.setMessage("Loading : " + values[0] + "%");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(String uri) {
+            super.onPostExecute(uri);
+            Toast.makeText(EditProfileAcivity.this, "Image uploaded successfully.", Toast.LENGTH_SHORT).show();
+
+        }
+    }
 }

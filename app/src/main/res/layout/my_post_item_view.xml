@@ -20,7 +20,7 @@
             android:layout_width="@dimen/dim_45"
             android:layout_height="@dimen/dim_45"
             android:layout_margin="@dimen/mar_10"
-            android:src="@drawable/profile_img"
+            android:src="@drawable/usr_img"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:riv_border_color="@android:color/transparent"

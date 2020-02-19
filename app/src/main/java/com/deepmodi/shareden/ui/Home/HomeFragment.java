@@ -25,6 +25,7 @@ import com.deepmodi.shareden.Adapter.HomePostImageViewAdapter;
 import com.deepmodi.shareden.ChatActivity;
 import com.deepmodi.shareden.FullScreenImageView;
 import com.deepmodi.shareden.HomeActivity;
+import com.deepmodi.shareden.Notifications.NotificationHelper;
 import com.deepmodi.shareden.R;
 import com.deepmodi.shareden.UploadActivity;
 import com.deepmodi.shareden.ViewHolder.LatestBookViewHolder;
@@ -52,8 +53,9 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
     private ChatRequest request, requestStatus;
     private UserRegister userRegister;
     private ImageButton btn_chat;
-    private static final String NOTIFICATION_CHANNEL_ID = "GeneralNewsShareden";
     private FirebaseRecyclerAdapter<UserPost, LatestBookViewHolder> adapterData;
+
+    private NotificationHelper notificationHelper;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -68,6 +70,8 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
         //Paper init
         Paper.init(v.getContext());
 
+        //init Notification helper
+        notificationHelper = new NotificationHelper(getActivity());
         //firebase init
         database = FirebaseDatabase.getInstance();
         reference = database.getReference("UserPost");
@@ -102,8 +106,10 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
         btn_chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(v.getContext(), ChatActivity.class));
-                createNotification(v);
+                //startActivity(new Intent(v.getContext(), ChatActivity.class));
+                NotificationCompat.Builder nb = notificationHelper.getChannel1Builder("Channel 1 is on the way.","This is a channel 1");
+                notificationHelper.getManager().notify(1,nb.build());
+
             }
         });
 
@@ -144,6 +150,7 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             try {
                                 requestStatus = dataSnapshot.getValue(ChatRequest.class);
+                                /*
                                     if (requestStatus.getSenderRequestStatus().equals("false")) {
                                         holder.user_follow_btn.setText("Requested");
 
@@ -152,6 +159,7 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                                     } else if (requestStatus.getSenderRequestStatus().equals("follow")) {
                                         holder.user_follow_btn.setText("Follow");
                                     }
+                                 */
                                 }
                             catch (Exception e)
                             {
@@ -224,36 +232,6 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
             });
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private void createNotification(View view) {
-        Intent intent = new Intent(getContext(), HomeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(getContext(),0,intent,0);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(view.getContext(), NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notification_icon)
-                .setContentTitle("Demo text")
-                .setContentText("This is a demo content text.")
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            CharSequence name = "SharedenNews";
-            String desc = "This is a shareden's latest news notification.";
-            int importance  = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
-            channel.setDescription(desc);
-
-            Context context;
-            NotificationManager notificationManager = view.getContext().getSystemService(NotificationManager.class);
-            if (notificationManager != null) {
-                notificationManager.createNotificationChannel(channel);
-                Paper.book().write(Common.NOTIFICATION_SHAREDEN_NEWS_ID,"2");
-                notificationManager.notify(Integer.parseInt(Paper.book().read(Common.NOTIFICATION_SHAREDEN_NEWS_ID).toString()),builder.build());
-            }
         }
     }
 }

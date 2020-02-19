@@ -3,14 +3,14 @@
     xmlns:dist="http://schemas.android.com/apk/distribution"
     package="com.deepmodi.shareden">
 
-    <dist:module dist:instant="true" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
+
+    <dist:module dist:instant="true" />
 
     <application
         android:name="androidx.multidex.MultiDexApplication"
@@ -21,11 +21,14 @@
         android:roundIcon="@drawable/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
-            android:screenOrientation="portrait"
+            android:name=".EditUserActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:name=".EditProfileAcivity"/>
+            ></activity>
+        <activity
+            android:name=".EditProfileAcivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
@@ -78,7 +81,6 @@
         <activity
             android:name=".HomeActivity"
             android:label="@string/title_activity_home"
-            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
@@ -99,7 +101,6 @@
             android:authorities="com.deepmodi.shareden.utils.FileSearch.provider"
             android:exported="false"
             android:grantUriPermissions="true">
-
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
@@ -113,8 +114,6 @@
         <service
             android:name=".services.ImageUploadService"
             android:exported="false" />
-
-
     </application>
 
 </manifest>

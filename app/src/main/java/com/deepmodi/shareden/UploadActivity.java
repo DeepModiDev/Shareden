@@ -1,5 +1,4 @@
 package com.deepmodi.shareden;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,6 +41,7 @@ import com.deepmodi.shareden.Adapter.CreatePostRecyclerViewAdapter;
 import com.deepmodi.shareden.Adapter.UploadImageRecyclerViewAdapter;
 import com.deepmodi.shareden.common.Common;
 import com.deepmodi.shareden.model.ImagesList;
+import com.deepmodi.shareden.model.MyPostView;
 import com.deepmodi.shareden.model.UIElement;
 import com.deepmodi.shareden.model.User;
 import com.deepmodi.shareden.model.UserPost;
@@ -135,6 +135,7 @@ public class UploadActivity extends AppCompatActivity {
     private String bookId;
     private int p;
     private UserPost post;
+    private MyPostView postView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,6 +145,7 @@ public class UploadActivity extends AppCompatActivity {
         setSupportActionBar(toolbar_upload);
 
         intentGetInfo = getIntent();
+        //postView = intentGetInfo.getParcelableExtra("EditBookData");
         //request storage permission
         requestStoragePermission();
         Paper.init(this);
@@ -196,6 +198,17 @@ public class UploadActivity extends AppCompatActivity {
             bookId = intentGetInfo.getStringExtra("BookId");
         }
 
+        /*
+        if(postView != null)
+        {
+            id_user_upload_book_name.setText(postView.getUserBookName());
+            id_user_upload_book_author.setText(postView.getUserBookAuthor());
+            id_user_upload_book_description.setText(postView.getUserBookDescription());
+            UpdateSelectedUrl = postView.getUserUploadBookList();
+            superUploadList = postView.getUserUploadBookList();
+            bookId = postView.getPostId();
+        }
+         */
         //bottom sheet view
         CoordinatorLayout coordinatorLayout = findViewById(R.id.coordinator);
         View constraintLayout = coordinatorLayout.findViewById(R.id.bottom_sheet);
@@ -406,15 +419,29 @@ public class UploadActivity extends AppCompatActivity {
         UploadAdapter.notifyDataSetChanged();
     }
 
+    private void UpdateUploadedBook() {
+        try {
+            if (UpdateSelectedUrl.size() > 0) {
+                UpdateImageAdapter = new UploadImageRecyclerViewAdapter(UpdateSelectedUrl, this, intentGetInfo.getBooleanExtra("BookEnableId", false), finalSendList, superUploadList);
+                recyclerView_selected_img.setAdapter(UpdateImageAdapter);
+                UpdateImageAdapter.notifyDataSetChanged();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void setSelectedImagesIntoList() {
 
         if (intentGetInfo.getBooleanExtra("BookEnableId", false)) {
             try {
                 for (int i = 0; i < finalSendList.size(); i++) {
-                    if (!UpdateSelectedUrl.contains(finalSendList.get(i))) {
+                    //Log.d(TAG,"outside if :"+String.valueOf(finalSendList.get(i)));
+                    if (!UpdateSelectedUrl.contains("file://" + finalSendList.get(i))) {
                         UpdateSelectedUrl.add("file://" + finalSendList.get(i));
+                        //Log.d(TAG,"inside if :"+String.valueOf(UpdateSelectedUrl));
                     }
-                    //Log.d(TAG, String.valueOf(UpdateSelectedUrl));
+                    //Log.d(TAG,"This is a main function :"+String.valueOf(UpdateSelectedUrl));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -527,19 +554,7 @@ public class UploadActivity extends AppCompatActivity {
         }
     }
 
-    private void UpdateUploadedBook() {
-        try {
-            if (UpdateSelectedUrl.size() > 0) {
-                UpdateImageAdapter = new UploadImageRecyclerViewAdapter(UpdateSelectedUrl, this, intentGetInfo.getBooleanExtra("BookEnableId", false), finalSendList, superUploadList);
-                recyclerView_selected_img.setAdapter(UpdateImageAdapter);
-                //Log.d(TAG, String.valueOf(UpdateSelectedUrl));
-                //Log.d(TAG, String.valueOf(UpdateSelectedUrl.size()));
-                UpdateImageAdapter.notifyDataSetChanged();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
 
     private void loadUserInfo() {
         referenceUserCall.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).addValueEventListener(new ValueEventListener() {
@@ -562,7 +577,7 @@ public class UploadActivity extends AppCompatActivity {
         if (finalSendList.size() > 0) {
             // finalUpdateUploadList.addAll(UpdateSelectedUrl);
             for (p = 0; p < finalSendList.size(); p++) {
-                Log.d(TAG, "Contains Sub link : " + finalSendList.get(p));
+               //Log.d(TAG, "Contains Sub link : " + finalSendList.get(p));
                 try {
                     //Log.d(TAG, "INSIDE THE FOR LOOP");
                     final File finalImage = FileUtil.from(this, Uri.parse("file://" + finalSendList.get(p)));
@@ -599,10 +614,14 @@ public class UploadActivity extends AppCompatActivity {
                                                     Log.d(TAG, "Contains Link : " + superUploadList);
                                                     btn_upload_book.setVisibility(View.GONE);
                                                     imagesList.setImagesList(superUploadList);
+                                                    if(register.getUserImg().isEmpty() || register.getUserImg()==null)
+                                                    {
+                                                        register.setUserImg("https://firebasestorage.googleapis.com/v0/b/shareden.appspot.com/o/usr_img.png?alt=media&token=d9e48a3e-dd3d-4383-957d-5bbc98597972");
+                                                    }
                                                     UserPost post = new UserPost(
                                                             register.getUserName(),
                                                             register.getUserLevel(),
-                                                            Paper.book().read(Common.USER_IMAGE_LINK).toString(),
+                                                            register.getUserImg(),
                                                             id_user_upload_book_description.getText().toString(),
                                                             "temp",
                                                             bookId,
@@ -635,11 +654,15 @@ public class UploadActivity extends AppCompatActivity {
             }
         } else {
             if (UpdateSelectedUrl.size() > 0) {
+                if(register.getUserImg().isEmpty() || register.getUserImg()==null)
+                {
+                    register.setUserImg("https://firebasestorage.googleapis.com/v0/b/shareden.appspot.com/o/usr_img.png?alt=media&token=d9e48a3e-dd3d-4383-957d-5bbc98597972");
+                }
                 imagesList.setImagesList(UpdateSelectedUrl);
                 UserPost post = new UserPost(
                         register.getUserName(),
                         register.getUserLevel(),
-                        Paper.book().read(Common.USER_IMAGE_LINK).toString(),
+                        register.getUserImg(),
                         id_user_upload_book_description.getText().toString(),
                         "temp",
                         bookId,
@@ -683,7 +706,7 @@ public class UploadActivity extends AppCompatActivity {
         }
         else
         {
-
+            super.onBackPressed();
         }
     }
 }
@@ -699,7 +722,6 @@ public class UploadActivity extends AppCompatActivity {
         //use the grid adapter to adapter the images to gridview
         final GridImageAdapter adapter = new GridImageAdapter(this, R.layout.gridlayout, "file://", imageUrls);
         gridView.setAdapter(adapter);
-
         try{
             if(imageUrls.size() > 0)
             {
@@ -709,22 +731,18 @@ public class UploadActivity extends AppCompatActivity {
             {
                 setImage(String.valueOf(R.mipmap.ic_launcher),galleryImageView,"file://");
             }
-
         }catch (ArrayIndexOutOfBoundsException e){
             Log.e(TAG, "setupGridView: ArrayIndexOutOfBoundsException: " +e.getMessage());
         }
-
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "onItemClick: selected an image: " + imageUrls.get(position));
-
                 setImage(imageUrls.get(position), galleryImageView, "file://");
                 mSelectedImage = imageUrls.get(position);
                 Log.d(TAG,"ArrayList of urls :"+ selectedUrls);
             }
         });
-
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -735,4 +753,3 @@ public class UploadActivity extends AppCompatActivity {
             }
         });
          */
-

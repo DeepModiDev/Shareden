@@ -1,8 +1,11 @@
 package com.deepmodi.shareden.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 
-public class MyPostView {
+public class MyPostView{
 
     private String postId;
     private String userFullName;
@@ -27,6 +30,18 @@ public class MyPostView {
         this.userUploadBookList = userUploadBookList;
         this.userBookName = userBookName;
         this.userBookAuthor = userBookAuthor;
+    }
+
+    protected MyPostView(Parcel in) {
+        postId = in.readString();
+        userFullName = in.readString();
+        userLevel = in.readString();
+        userImg = in.readString();
+        userBookDescription = in.readString();
+        postTime = in.readString();
+        userUploadBookList = in.createStringArrayList();
+        userBookName = in.readString();
+        userBookAuthor = in.readString();
     }
 
     public String getPostId() {

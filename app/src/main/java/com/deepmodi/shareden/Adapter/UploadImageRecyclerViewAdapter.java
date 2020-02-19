@@ -69,7 +69,7 @@ public class UploadImageRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
                     public void onClick(View v) {
                         try {
                             finalSendList.remove(imageUrls.get(position).replace("file://","").trim());
-                            Log.d("UploadActivity",imageUrls.get(position).replace("file://",""));
+                            //Log.d("UploadActivity",imageUrls.get(position).replace("file://",""));
                             superImageUrls.remove(imageUrls.get(position));
                             imageUrls.remove(position);
                         }catch (Exception e)
