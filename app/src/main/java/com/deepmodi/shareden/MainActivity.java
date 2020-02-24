@@ -1,10 +1,10 @@
 package com.deepmodi.shareden;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -18,9 +18,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.deepmodi.shareden.common.Common;
-import com.deepmodi.shareden.model.UserRegister;
+import com.deepmodi.shareden.model.UserRegisterClass;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseDatabase database;
     DatabaseReference reference;
-    UserRegister register;
+    UserRegisterClass register;
     TextView textView;
     Button btn_retry;
     ImageView imageView;
@@ -81,19 +80,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkUserExistance() {
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try {
-                    register = dataSnapshot.child(String.valueOf(Paper.book().read(Common.USER_FINAL_NUMBER))).getValue(UserRegister.class);
+                    register = dataSnapshot.child(String.valueOf(Paper.book().read(Common.USER_FINAL_NUMBER))).getValue(UserRegisterClass.class);
                     assert register != null;
                     if (register.getUserId().equals(Paper.book().read(Common.USER_AUTH_ID))) {
-                        startActivity(new Intent(MainActivity.this, HomeActivity.class));
-                        finish();
+                        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                        startActivityForResult(intent,110);
                     }
                 } catch (Exception e) {
-                    startActivity(new Intent(MainActivity.this, LogInActivity.class));
-                    finish();
+                    Intent intent = new Intent(MainActivity.this, LogInActivity.class);
+                    startActivityForResult(intent,110);
                 }
             }
 
@@ -102,5 +101,14 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 110 && resultCode == 110)
+        {
+            this.finish();
+        }
     }
 }

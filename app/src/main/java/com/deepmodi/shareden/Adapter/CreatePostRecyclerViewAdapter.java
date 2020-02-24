@@ -23,6 +23,7 @@ import com.squareup.picasso.Picasso;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -75,6 +76,7 @@ public class CreatePostRecyclerViewAdapter extends RecyclerView.Adapter<CreatePo
     public void onBindViewHolder(@NonNull final CreatePostGridViewHolder holder, int position) {
         final UIElement model = uiElements.get(position);
         //holder.setIsRecyclable(false);
+        Collections.sort(URIs,Collections.reverseOrder());
         Picasso.get().load("file://"+URIs.get(position)).resize(100,100).centerCrop().placeholder(R.mipmap.ic_launcher).error(R.mipmap.ic_launcher).into(holder.grid_images);
         holder.setCreatePostInterface(new CreatePostInterface() {
             @Override

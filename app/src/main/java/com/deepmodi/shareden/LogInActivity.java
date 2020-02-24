@@ -1,7 +1,9 @@
 package com.deepmodi.shareden;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
@@ -9,12 +11,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
-
 import com.deepmodi.shareden.common.Common;
-import com.deepmodi.shareden.model.UserRegister;
+import com.deepmodi.shareden.model.UserRegisterClass;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,11 +28,14 @@ import io.paperdb.Paper;
 
 public class LogInActivity extends AppCompatActivity {
 
-    EditText edit_text_phonenumber,edit_text_password;
-    Button btn_sign_in,register_user;
+    TextInputEditText edit_text_phonenumber,edit_text_password;
+    AppCompatButton btn_sign_in,register_user;
     FirebaseDatabase database;
     DatabaseReference reference;
+    TextView forgot_password;
 
+    private static final int IS_ACTIVITY_PROGRESS_EXISTS = 999;
+    private static final int IS_FORGOT_PASSWORD_IS_DONE = 121;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +58,7 @@ public class LogInActivity extends AppCompatActivity {
         edit_text_password = findViewById(R.id.edit_text_password);
         btn_sign_in = findViewById(R.id.btn_sign_in);
         register_user = findViewById(R.id.register_user);
+        forgot_password = findViewById(R.id.forgot_password);
 
 
         btn_sign_in.setOnClickListener(new View.OnClickListener() {
@@ -80,13 +85,19 @@ public class LogInActivity extends AppCompatActivity {
             }
         });
 
+        forgot_password.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                       Intent intent = new Intent(LogInActivity.this,ForgotPassword.class);
+                       startActivity(intent);
+            }
+        });
+
         register_user.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LogInActivity.this,SignUpActivity.class);
-                startActivity(intent);
-                finish();
-
+                startActivityForResult(intent,IS_ACTIVITY_PROGRESS_EXISTS);
             }
         });
     }
@@ -117,18 +128,18 @@ public class LogInActivity extends AppCompatActivity {
 
     private void userLoginProcess(final String phoneNumber, final String password)
     {
-        reference.child(phoneNumber).addValueEventListener(new ValueEventListener() {
+        reference.child(phoneNumber).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                UserRegister userRegister = dataSnapshot.getValue(UserRegister.class);
+                UserRegisterClass userRegister = dataSnapshot.getValue(UserRegisterClass.class);
                 assert userRegister != null;
                 try {
                     if(userRegister.getUserNumber().equals(phoneNumber) && userRegister.getUserPassword().equals(password))
                     {
                         Paper.book().write(Common.USER_AUTH_ID,userRegister.getUserId());
                         Paper.book().write(Common.USER_FINAL_NUMBER,userRegister.getUserNumber());
-                        startActivity(new Intent(LogInActivity.this,HomeActivity.class));
-                        finish();
+                        Intent intent = new Intent(LogInActivity.this,HomeActivity.class);
+                        startActivityForResult(intent,IS_ACTIVITY_PROGRESS_EXISTS);
                     }
                     else
                     {
@@ -149,5 +160,12 @@ public class LogInActivity extends AppCompatActivity {
         });
     }
 
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == IS_ACTIVITY_PROGRESS_EXISTS && resultCode == RESULT_OK)
+        {
+            LogInActivity.this.finish();
+        }
+    }
 }

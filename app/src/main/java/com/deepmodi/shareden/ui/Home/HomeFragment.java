@@ -32,7 +32,7 @@ import com.deepmodi.shareden.ViewHolder.LatestBookViewHolder;
 import com.deepmodi.shareden.common.Common;
 import com.deepmodi.shareden.model.ChatRequest;
 import com.deepmodi.shareden.model.UserPost;
-import com.deepmodi.shareden.model.UserRegister;
+import com.deepmodi.shareden.model.UserRegisterClass;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
@@ -51,10 +51,9 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
     FirebaseDatabase database, databaseRequest, databaseWhoami, databaseRequestStatus;
     HomeViewModel viewModel;
     private ChatRequest request, requestStatus;
-    private UserRegister userRegister;
+    private UserRegisterClass userRegister;
     private ImageButton btn_chat;
     private FirebaseRecyclerAdapter<UserPost, LatestBookViewHolder> adapterData;
-
     private NotificationHelper notificationHelper;
 
     public static HomeFragment newInstance() {
@@ -85,8 +84,10 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
         databaseRequestStatus = FirebaseDatabase.getInstance();
         referenceRequestStatus = databaseRequestStatus.getReference("UserRequests");
 
-        userRegister = new UserRegister();
-        requestStatus = new ChatRequest();
+        //userRegister = new UserRegister();
+        //requestStatus = new ChatRequest();
+
+        RecyclerView suggestion_recyclerView = v.findViewById(R.id.suggestion_recyclerView);
 
         final ImageButton float_create_post = v.findViewById(R.id.create_post);
         RecyclerView.LayoutManager manager = new LinearLayoutManager(v.getContext());
@@ -140,7 +141,7 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                     holder.profile_img.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent intent = new Intent(getActivity(), FullScreenImageView.class);
+                            Intent intent = new Intent(v.getContext(), FullScreenImageView.class);
                             intent.putExtra("fullScreenImageUrl", model.getUserImg());
                             startActivity(intent);
                         }
@@ -219,10 +220,10 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
 
     private void loadDetails() {
         try {
-            referenceWhoami.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).addValueEventListener(new ValueEventListener() {
+            referenceWhoami.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    userRegister = dataSnapshot.getValue(UserRegister.class);
+                    userRegister = dataSnapshot.getValue(UserRegisterClass.class);
                 }
 
                 @Override

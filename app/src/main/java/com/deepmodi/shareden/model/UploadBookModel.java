@@ -4,22 +4,22 @@ import java.util.List;
 
 public class UploadBookModel {
 
-    private UserRegister register;
+    private UserRegisterClass register;
     private List<String> imagesList;
 
     public UploadBookModel() {
     }
 
-    public UploadBookModel(UserRegister register, List<String> imagesList) {
+    public UploadBookModel(UserRegisterClass register, List<String> imagesList) {
         this.register = register;
         this.imagesList = imagesList;
     }
 
-    public UserRegister getRegister() {
+    public UserRegisterClass getRegister() {
         return register;
     }
 
-    public void setRegister(UserRegister register) {
+    public void setRegister(UserRegisterClass register) {
         this.register = register;
     }
 

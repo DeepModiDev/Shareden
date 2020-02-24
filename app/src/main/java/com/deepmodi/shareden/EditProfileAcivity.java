@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -23,10 +22,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.deepmodi.shareden.common.Common;
 import com.deepmodi.shareden.model.UserPost;
-import com.deepmodi.shareden.model.UserRegister;
+import com.deepmodi.shareden.model.UserRegisterClass;
 import com.deepmodi.shareden.ui.MyAccount.MyAccountFragment;
 import com.deepmodi.shareden.utils.FileUtil;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -65,7 +63,7 @@ public class EditProfileAcivity extends AppCompatActivity {
     private StorageReference referenceStorage;
     private FirebaseDatabase data_base,databaseMyPostEdit;
     private DatabaseReference referenceEdit,referenceMyPostEdit;
-    private UserRegister register = new UserRegister();
+    private UserRegisterClass registerClass;
     private List<String> myIds = new ArrayList<>();
     private List<UserPost> post = new ArrayList<>();
     private ProgressDialog progressDialog;
@@ -111,12 +109,6 @@ public class EditProfileAcivity extends AppCompatActivity {
 
         loadUserInformation(referenceEdit);
 
-
-        edit_user_name.setText(register.getUserName());
-        edit_user_phone.setText(register.getUserNumber());
-        edit_user_phone.setEnabled(false);
-        edit_user_occupation.setText(register.getUserLevel());
-        edit_user_bio.setText(register.getUserDesc());
         try
         {
             Picasso.get().load(Paper.book().read(Common.USER_IMAGE_LINK).toString()).error(R.drawable.usr_img).into(profile_img);
@@ -142,10 +134,10 @@ public class EditProfileAcivity extends AppCompatActivity {
         btn_update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                register.setUserName(edit_user_name.getText().toString());
-                register.setUserLevel(edit_user_occupation.getText().toString());
-                register.setUserDesc(edit_user_bio.getText().toString());
-                referenceEdit.setValue(register);
+                registerClass.setUserName(edit_user_name.getText().toString());
+                registerClass.setUserLevel(edit_user_occupation.getText().toString());
+                registerClass.setUserDesc(edit_user_bio.getText().toString());
+                referenceEdit.setValue(registerClass);
                // updateUserInformation(referenceMyPostEdit);
             }
         });
@@ -209,15 +201,16 @@ public class EditProfileAcivity extends AppCompatActivity {
     }
 
     private void loadUserInformation(DatabaseReference query) {
+        registerClass = new UserRegisterClass();
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                register = dataSnapshot.getValue(UserRegister.class);
+                registerClass = dataSnapshot.getValue(UserRegisterClass.class);
                 try {
-                    if(register.getUserImg()!=null)
+                    if(registerClass.getUserImg()!=null)
                     {
-                        Picasso.get().load(register.getUserImg()).placeholder(R.drawable.usr_img).into(profile_img);
-                        Paper.book().write(Common.USER_IMAGE_LINK,register.getUserImg());
+                        Picasso.get().load(registerClass.getUserImg()).placeholder(R.drawable.usr_img).into(profile_img);
+                        Paper.book().write(Common.USER_IMAGE_LINK,registerClass.getUserImg());
                     }
                     //Log.d("MyAccountMessage","Message :"+register.getUserName()+register.getUserImg());
                 }catch (Exception e)
@@ -232,6 +225,11 @@ public class EditProfileAcivity extends AppCompatActivity {
 
             }
         });
+        edit_user_name.setText(registerClass.getUserName());
+        edit_user_phone.setText(registerClass.getUserNumber());
+        edit_user_phone.setEnabled(false);
+        edit_user_occupation.setText(registerClass.getUserLevel());
+        edit_user_bio.setText(registerClass.getUserDesc());
     }
 
    /* private void updateUserInformation(final DatabaseReference reference) {
@@ -313,8 +311,8 @@ public class EditProfileAcivity extends AppCompatActivity {
                                 public void onSuccess(Uri uri) {
                                     result = uri.toString();
                                     Paper.book().write(Common.USER_IMAGE_LINK, result);
-                                    register.setUserImg(result);
-                                    referenceEdit.setValue(register);
+                                    registerClass.setUserImg(result);
+                                    referenceEdit.setValue(registerClass);
                                 }
                             });
                         }

@@ -22,10 +22,25 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="AppTheme.DefaultTheme">
+    <style name="MyCustomTheme" parent="Theme.MaterialComponents.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/general_color</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorSecondary">#000</item>
+        <item name="actionMenuTextColor">#000</item>
+        <item name="colorError">#F44336</item>
     </style>
+
+    <style name="EditCustomTheme" parent="Theme.MaterialComponents.Light">
+        <item name="colorSecondary">#000</item>
+    </style>
+
+    <style name="BottomSheetDialogTheme" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetDialogTheme</item>
+    </style>
+
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

@@ -1,26 +1,20 @@
 package com.deepmodi.shareden;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatRadioButton;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
-
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
 import com.deepmodi.shareden.ViewModel.FirebaseCheckUserViewModel;
-import com.deepmodi.shareden.model.UserRegister;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,13 +25,15 @@ import com.google.firebase.database.ValueEventListener;
 public class SignUpActivity extends AppCompatActivity {
 
     RadioGroup radioGroup_gender,radioGroup_level;
-    AppCompatRadioButton appCompatRadioButton_gender,appCompatRadioButton_level;
-    Button sign_in_user,btn_register;
-    EditText edit_signup_text_name,edit_signup_text_phonenumber,edit_signup_text_password;
-
+    RadioButton appCompatRadioButton_gender,appCompatRadioButton_level;
+    MaterialButton btn_register;
+    AppCompatButton sign_in_user;
+    TextInputEditText edit_signup_text_phonenumber,edit_signup_text_password,edit_signup_text_password_varify;
+    TextInputEditText edit_signup_text_name;
     FirebaseDatabase database;
     DatabaseReference reference;
     FirebaseCheckUserViewModel viewModel;
+    private static final int REQUEST_TO_CLOSE_ACTIVITY = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +57,7 @@ public class SignUpActivity extends AppCompatActivity {
         edit_signup_text_name = findViewById(R.id.edit_signup_text_name);
         edit_signup_text_phonenumber = findViewById(R.id.edit_text_signup_phonenumber);
         edit_signup_text_password = findViewById(R.id.edit_signup_text_password);
+        edit_signup_text_password_varify = findViewById(R.id.edit_signup_text_password_varify);
 
         database = FirebaseDatabase.getInstance();
         reference = database.getReference("Users");
@@ -74,35 +71,41 @@ public class SignUpActivity extends AppCompatActivity {
                     {
                         if(edit_signup_text_password.getText().toString().length() >= 6)
                         {
-                            int radioLevel = radioGroup_level.getCheckedRadioButtonId();
-                            appCompatRadioButton_level = findViewById(radioLevel);
+                           int radioLevel = radioGroup_level.getCheckedRadioButtonId();
+                           appCompatRadioButton_level = findViewById(radioLevel);
 
-                            int radioId = radioGroup_gender.getCheckedRadioButtonId();
-                            appCompatRadioButton_gender = findViewById(radioId);
+                           int radioId = radioGroup_gender.getCheckedRadioButtonId();
+                           appCompatRadioButton_gender = findViewById(radioId);
 
-                            reference.addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    if(dataSnapshot.hasChild(edit_signup_text_phonenumber.getText().toString()))
-                                    {
-                                        edit_signup_text_phonenumber.requestFocus();
-                                        edit_signup_text_phonenumber.setError("Phone number is already reqistered please login.");
-                                    }
-                                    else
-                                    {
-                                        registerProcess(
-                                                edit_signup_text_name.getText().toString(),
-                                                edit_signup_text_phonenumber.getText().toString(),
-                                                edit_signup_text_password.getText().toString(),
-                                                String.valueOf(appCompatRadioButton_gender.getText()),
-                                                String.valueOf(appCompatRadioButton_level.getText()));
-                                       finish();
-                                    }
-                                }
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                }
-                            });
+                           if(edit_signup_text_password.getText().toString().equals(edit_signup_text_password_varify.getText().toString()))
+                           {
+                               reference.addValueEventListener(new ValueEventListener() {
+                                   @Override
+                                   public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                       if(dataSnapshot.hasChild(edit_signup_text_phonenumber.getText().toString()))
+                                       {
+                                           edit_signup_text_phonenumber.requestFocus();
+                                           edit_signup_text_phonenumber.setError("Phone number is already reqistered please login.");
+                                       }
+                                       else
+                                       {
+                                           registerProcess(
+                                                   edit_signup_text_name.getText().toString(),
+                                                   edit_signup_text_phonenumber.getText().toString(),
+                                                   edit_signup_text_password.getText().toString(),
+                                                   String.valueOf(appCompatRadioButton_gender.getText()),
+                                                   String.valueOf(appCompatRadioButton_level.getText()));
+                                       }
+                                   }
+                                   @Override
+                                   public void onCancelled(@NonNull DatabaseError databaseError) {
+                                   }
+                               });
+                            }
+                           else {
+                               edit_signup_text_password_varify.requestFocus();
+                               edit_signup_text_password_varify.setError("Password doesn't match please enter again.");
+                           }
                         }
                         else
                         {
@@ -132,9 +135,9 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
-    public void checkButton(View v) {
+    public void checkButton(View view) {
         int radioId = radioGroup_gender.getCheckedRadioButtonId();
-        appCompatRadioButton_gender = findViewById(radioId);
+        appCompatRadioButton_gender = view.findViewById(radioId);
         Toast.makeText(this, ""+appCompatRadioButton_gender.getText(), Toast.LENGTH_SHORT).show();
     }
 
@@ -153,7 +156,31 @@ public class SignUpActivity extends AppCompatActivity {
         intent.putExtra("userPassword",userPassword);
         intent.putExtra("userGender",userGender);
         intent.putExtra("userLevel",userLevel);
-        startActivity(intent);
+        startActivityForResult(intent,REQUEST_TO_CLOSE_ACTIVITY);
     }
 
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        this.setResult(999);
+    }
+
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        this.setResult(999);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == REQUEST_TO_CLOSE_ACTIVITY && resultCode == RESULT_OK)
+        {
+            SignUpActivity.this.finish();
+        }
+    }
 }

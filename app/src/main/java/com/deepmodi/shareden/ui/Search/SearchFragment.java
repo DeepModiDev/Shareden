@@ -96,7 +96,7 @@ public class SearchFragment extends Fragment {
                 holder.profile_img.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(getActivity(), FullScreenImageView.class);
+                        Intent intent = new Intent(v.getContext(), FullScreenImageView.class);
                         intent.putExtra("fullScreenImageUrl", model.getUserImg());
                         startActivity(intent);
                     }
@@ -140,7 +140,7 @@ public class SearchFragment extends Fragment {
                 holder.profile_img.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(getActivity(), FullScreenImageView.class);
+                        Intent intent = new Intent(v.getContext(), FullScreenImageView.class);
                         intent.putExtra("fullScreenImageUrl", model.getUserImg());
                         startActivity(intent);
                     }

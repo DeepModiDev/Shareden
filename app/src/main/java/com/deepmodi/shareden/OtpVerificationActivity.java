@@ -3,7 +3,6 @@ package com.deepmodi.shareden;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.arch.core.executor.TaskExecutor;
-
 import android.content.Intent;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -15,9 +14,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.deepmodi.shareden.common.Common;
-import com.deepmodi.shareden.model.UserRegister;
+import com.deepmodi.shareden.model.UserRegisterClass;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskExecutors;
@@ -33,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import io.paperdb.Paper;
 
@@ -123,7 +122,6 @@ public class OtpVerificationActivity extends AppCompatActivity {
         @Override
         public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
             final String code = phoneAuthCredential.getSmsCode();
-
             if(code!=null)
             {
                 new Handler().postDelayed(new Runnable() {
@@ -183,7 +181,8 @@ public class OtpVerificationActivity extends AppCompatActivity {
 
         @Override
         public void onVerificationFailed(@NonNull FirebaseException e) {
-            resendVerificationCode(USER_NUMBER);//THIS LINE WILL CALL RE SEND OTP METHOD AND ALL THE FOUR METHOD
+            resendVerificationCode(USER_NUMBER);
+            //THIS LINE WILL CALL RE SEND OTP METHOD AND ALL THE FOUR METHOD
                                                 //EXECUTE AGAIN THIS IS A RECURSIVE PROCESS.
         }
 
@@ -191,6 +190,7 @@ public class OtpVerificationActivity extends AppCompatActivity {
         public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
             VERIFICATION_ID = s;
             super.onCodeSent(s, forceResendingToken);
+
         }
     };
 
@@ -240,7 +240,7 @@ public class OtpVerificationActivity extends AppCompatActivity {
                                 Paper.book().write(Common.USER_FINAL_PASSWORD,USER_PASSWORD);
                                 Paper.book().write(Common.USER_AUTH_ID,firebase_user.getUid());
 
-                                UserRegister userRegister = new UserRegister(USER_NAME,USER_NUMBER,USER_PASSWORD,USER_GENDER,USER_LEVEL,firebase_user.getUid());
+                                UserRegisterClass userRegister = new UserRegisterClass(USER_NAME,USER_NUMBER,USER_PASSWORD,USER_GENDER,USER_LEVEL,firebase_user.getUid(),"true");
                                 reference.child(USER_NUMBER).setValue(userRegister);
 
                                 startActivity(new Intent(OtpVerificationActivity.this,HomeActivity.class));
@@ -250,12 +250,24 @@ public class OtpVerificationActivity extends AppCompatActivity {
 
                             //verification unsuccessful.. display an error message
                             String message = "Somthing is wrong, you entered wrong OTP";
+                            Log.e("OtpVerificationActivity","Unable to send otp. 2");
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                 Toast.makeText(OtpVerificationActivity.this, message, Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
                 });
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        this.setResult(101);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.setResult(101);
     }
 }

@@ -48,7 +48,7 @@ import com.deepmodi.shareden.ViewHolder.MyPostViewHolder;
 import com.deepmodi.shareden.common.Common;
 import com.deepmodi.shareden.model.MyPostView;
 import com.deepmodi.shareden.model.UserPost;
-import com.deepmodi.shareden.model.UserRegister;
+import com.deepmodi.shareden.model.UserRegisterClass;
 import com.deepmodi.shareden.ui.MyPost.MyPostFragment;
 import com.deepmodi.shareden.utils.FileUtil;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -83,22 +83,19 @@ import io.paperdb.Paper;
 
 import static android.app.Activity.RESULT_OK;
 
-public class MyAccountFragment extends Fragment  implements LifecycleOwner
+public class MyAccountFragment extends Fragment implements LifecycleOwner
 {
 
         private MyAccountViewModel mViewModel;
         AppBarLayout appBarLayout;
         private RoundedImageView profile_img;
         private DatabaseReference reference,referenceMyPost;
-        private UserRegister register = new UserRegister();
         private StorageReference referenceStorage;
         private String tempUrl;
         private TextView edit_user_name,edit_user_level,edit_user_desc;
         private List<String> myIds = new ArrayList<>();
         private List<UserPost> post = new ArrayList<>();
-
-    UserRegister updatedRegister = new UserRegister();
-
+        UserRegisterClass updatedRegister;
     public static MyAccountFragment newInstance() {
         return new MyAccountFragment();
     }
@@ -243,16 +240,16 @@ public class MyAccountFragment extends Fragment  implements LifecycleOwner
     }
 
     private void loadUserInformation(DatabaseReference query) {
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                register = dataSnapshot.getValue(UserRegister.class);
+                updatedRegister = dataSnapshot.getValue(UserRegisterClass.class);
                try {
-                   assert register != null;
-                   if(register.getUserImg()!=null)
+                   assert updatedRegister != null;
+                   if(updatedRegister.getUserImg()!=null)
                    {
-                       Picasso.get().load(register.getUserImg()).placeholder(R.drawable.usr_img).into(profile_img);
-                       Paper.book().write(Common.USER_IMAGE_LINK,register.getUserImg());
+                       Picasso.get().load(updatedRegister.getUserImg()).placeholder(R.drawable.usr_img).into(profile_img);
+                       Paper.book().write(Common.USER_IMAGE_LINK,updatedRegister.getUserImg());
                    }
                    //Log.d("MyAccountMessage","Message :"+register.getUserName()+register.getUserImg());
                }catch (Exception e)
@@ -260,9 +257,9 @@ public class MyAccountFragment extends Fragment  implements LifecycleOwner
                    Log.e("MyAccoutException :",e.getMessage());
                    profile_img.setImageResource(R.drawable.usr_img);
                }
-               edit_user_name.setText(register.getUserName());
-               edit_user_level.setText(register.getUserLevel());
-               edit_user_desc.setText(register.getUserDesc());
+               edit_user_name.setText(updatedRegister.getUserName());
+               edit_user_level.setText(updatedRegister.getUserLevel());
+               edit_user_desc.setText(updatedRegister.getUserDesc());
             }
 
             @Override
@@ -336,8 +333,8 @@ public class MyAccountFragment extends Fragment  implements LifecycleOwner
                                             public void onSuccess(Uri uri) {
                                                 tempUrl = uri.toString();
                                                 Paper.book().write(Common.USER_IMAGE_LINK,tempUrl);
-                                                register.setUserImg(tempUrl);
-                                                reference.setValue(register);
+                                                updatedRegister.setUserImg(tempUrl);
+                                                reference.setValue(updatedRegister);
                                             }
                                         });
                                     }

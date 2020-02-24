@@ -21,7 +21,7 @@
             android:id="@+id/edit_text_search"
             android:background="@android:color/transparent"
             android:layout_width="match_parent"
-            android:layout_height="38dp"
+            android:layout_height="45dp"
             android:hint="Search"
             android:fontFamily="@font/dosis_extrabold"
             android:textStyle="normal"
@@ -39,7 +39,7 @@
         <ImageButton
             android:id="@+id/btn_click_search"
             android:layout_width="80dp"
-            android:layout_height="38dp"
+            android:layout_height="45dp"
             android:paddingLeft="10dp"
             android:background="@android:color/transparent"
             app:srcCompat="@drawable/ic_search"

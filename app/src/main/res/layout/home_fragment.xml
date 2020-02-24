@@ -8,7 +8,6 @@
     android:id="@+id/home_fragment_framelayout"
     android:background="@color/general_color"
     tools:context=".ui.Home.HomeFragment"
-
     >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -71,14 +70,27 @@
     </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/suggestion_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            tools:itemCount="10"
+            android:background="@color/general_color"
+            tools:listitem="@layout/item_suggestion"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/app_bar_layout" />
+
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/app_bar_layout"
-            />
+
+            app:layout_constraintTop_toBottomOf="@+id/suggestion_recyclerView" />
 
         <ImageButton
             android:id="@+id/create_post"

@@ -1,30 +1,36 @@
 package com.deepmodi.shareden;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
+import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -36,7 +42,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import com.deepmodi.shareden.Adapter.CreatePostRecyclerViewAdapter;
 import com.deepmodi.shareden.Adapter.UploadImageRecyclerViewAdapter;
 import com.deepmodi.shareden.common.Common;
@@ -45,21 +50,31 @@ import com.deepmodi.shareden.model.MyPostView;
 import com.deepmodi.shareden.model.UIElement;
 import com.deepmodi.shareden.model.User;
 import com.deepmodi.shareden.model.UserPost;
-import com.deepmodi.shareden.model.UserRegister;
-import com.deepmodi.shareden.services.ImageUploadService;
+import com.deepmodi.shareden.model.UserRegisterClass;
 import com.deepmodi.shareden.utils.FilePaths;
 import com.deepmodi.shareden.utils.FileSearch;
 import com.deepmodi.shareden.utils.FileUtil;
+import com.google.android.gms.common.data.EntityBuffer;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskExecutors;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.ml.vision.FirebaseVision;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
+import com.google.firebase.ml.vision.text.FirebaseVisionCloudTextRecognizerOptions;
+import com.google.firebase.ml.vision.text.FirebaseVisionText;
+import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
+import com.google.firebase.ml.vision.text.RecognizedLanguage;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -68,11 +83,18 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.logging.Logger;
+
 import id.zelory.compressor.Compressor;
 import io.paperdb.Paper;
 
@@ -101,6 +123,8 @@ public class UploadActivity extends AppCompatActivity {
     GridView gridView;
     String mSelectedImage;
 
+    private String[] select_book_type ={"Select your book type","Novel","Engineering","Medical","Commerce","Arts","11th Std","12th Std"};
+
     List<String> selectedUrls = new ArrayList<>();
     List<String> UpdateSelectedUrl = new ArrayList<>();
     List<UIElement> uiElements;
@@ -126,7 +150,7 @@ public class UploadActivity extends AppCompatActivity {
 
     protected FirebaseDatabase databaseUserCall, databaseMyPost;
     protected DatabaseReference referenceUserCall, referenceMyPost;
-    private UserRegister register;
+    private UserRegisterClass register;
 
     private Date date = new Date();
     Intent intentGetInfo;
@@ -136,6 +160,13 @@ public class UploadActivity extends AppCompatActivity {
     private int p;
     private UserPost post;
     private MyPostView postView;
+
+    private BottomSheetDialog bottomSheetDialog;
+    private ConstraintLayout parentLayout;
+
+    File photoFile = null;
+    private String capturedImagePath;
+    public static final int CAMERA_REQUEST_CODE = 1234;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,11 +207,27 @@ public class UploadActivity extends AppCompatActivity {
         recyclerView_selected_img.setLayoutManager(manager);
         recyclerView_selected_img.setHasFixedSize(true);
 
+        parentLayout = findViewById(R.id.constraint_parent_1);
 
         id_user_upload_book_name = findViewById(R.id.id_user_upload_book_name);
         id_user_upload_book_author = findViewById(R.id.id_user_upload_book_author);
         id_user_upload_book_description = findViewById(R.id.id_user_upload_book_description);
+        AppCompatSpinner spinner_select_book_level = findViewById(R.id.appCompatSpinner);
 
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,select_book_type);
+        spinner_select_book_level.setAdapter(adapter);
+
+        spinner_select_book_level.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(UploadActivity.this, ""+select_book_type[position], Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         fab_attach = findViewById(R.id.fab_attach);
         //gridView = findViewById(R.id.gridView);
         progressBar = findViewById(R.id.progressBar);
@@ -237,13 +284,32 @@ public class UploadActivity extends AppCompatActivity {
         try {
             Picasso.get().load(Paper.book().read(Common.USER_IMAGE_LINK).toString()).into(profile_img_upload);
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG,Objects.requireNonNull(e.getMessage()));
         }
 
         fab_attach.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+                bottomSheetDialog = new BottomSheetDialog(UploadActivity.this,R.style.BottomSheetDialogTheme);
+                View view = LayoutInflater.from(UploadActivity.this).inflate(R.layout.bottom_sheet_select_item,parentLayout,false);
+                bottomSheetDialog.setContentView(view);
+                view.findViewById(R.id.btn_start_camera).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openCamera();
+                        bottomSheetDialog.dismiss();
+                    }
+                });
+
+                view.findViewById(R.id.btn_select_from_gallery).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                        bottomSheetDialog.dismiss();
+                    }
+                });
+                bottomSheetDialog.show();
             }
         });
 
@@ -258,6 +324,7 @@ public class UploadActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
                 /**
                  * Very Important function is below
                  */
@@ -265,6 +332,7 @@ public class UploadActivity extends AppCompatActivity {
                 /**
                  * Very Important function is above
                  */
+
                 if (intentGetInfo.getBooleanExtra("BookEnableId", false)) {
                     UpdateUploadedBook();
                 } else {
@@ -316,7 +384,77 @@ public class UploadActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
     }
+
+    //Methods for capture image and save images
+
+    private void openCamera() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { captureImage(); } else { captureImage2(); }
+    }
+
+    private void captureImage() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        try {
+            photoFile = createImageFile();
+            if(photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.deepmodi.shareden.UploadActivity.fileprovider"
+                ,photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,photoURI);
+                startActivityForResult(takePictureIntent,CAMERA_REQUEST_CODE);
+            }
+        }catch (Exception e)
+        {
+            Log.e(TAG,e.getMessage());
+        }
+    }
+
+    private void captureImage2() {
+        try {
+            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            photoFile = createImageFile4();
+            if(photoFile!=null)
+            {
+                Log.i(TAG,photoFile.getAbsolutePath());
+                Uri photoURI  = Uri.fromFile(photoFile);
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
+            }
+        } catch (Exception e) { Log.e(TAG,e.getMessage()); }
+    }
+
+    private File createImageFile4() throws IOException{
+        File mediaStoreDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"Shareden");
+        if(!mediaStoreDir.exists())
+        {
+            if(!mediaStoreDir.mkdirs())
+            {
+                Toast.makeText(this, "Unable to create dir.", Toast.LENGTH_SHORT).show();
+                return null;
+            }
+        }
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
+                Locale.getDefault()).format(new Date());
+        File mediaFile = new File(mediaStoreDir.getPath()+File.separator + "IMG_"+timeStamp+".jpg");
+        return mediaFile;
+    }
+
+    private File createImageFile() throws IOException {
+        String currentTimeStamp  = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + currentTimeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName, //prefix
+                ".jpg", //suffix
+                storageDir);
+        capturedImagePath = image.getAbsolutePath();
+        return image;
+    }
+
+
+    //Methods for capture image and save images
 
     private void requestStoragePermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -443,6 +581,45 @@ public class UploadActivity extends AppCompatActivity {
                     }
                     //Log.d(TAG,"This is a main function :"+String.valueOf(UpdateSelectedUrl));
                 }
+
+                if (UpdateSelectedUrl.size() > 0)
+                {
+                    try {
+                        FirebaseVisionImage visionImage = FirebaseVisionImage.fromFilePath(this,Uri.parse("file://"+UpdateSelectedUrl.get(0)));
+                        FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
+                        detector.processImage(visionImage).addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+                            @Override
+                            public void onSuccess(FirebaseVisionText firebaseVisionText) {
+                                firebaseVisionText.getText();
+                                if(firebaseVisionText.getTextBlocks().size() > 1)
+                                {
+                                    try {
+                                        String bookName = firebaseVisionText.getTextBlocks().get(0).getText() +" "+ firebaseVisionText.getTextBlocks().get(1).getText();
+                                        id_user_upload_book_name.setText(bookName);
+
+                                        int bookSecondLastPosition = firebaseVisionText.getTextBlocks().size() - 1;
+                                        String bookDescription = firebaseVisionText.getTextBlocks().get(bookSecondLastPosition - 1).getText();
+                                        id_user_upload_book_description.setText(bookDescription);
+
+                                    }catch (Exception e)
+                                    {
+                                        Log.e("UploadActivity", Objects.requireNonNull(e.getMessage()));
+                                    }
+                                }
+                            }
+                        })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.e("UploadActivity",Objects.requireNonNull(e.getMessage()));
+                                    }
+                                });
+                    }catch(Exception e)
+                    {
+                        Log.e("UploadActivity.class",Objects.requireNonNull(e.getMessage()));
+                    }
+                }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -452,7 +629,45 @@ public class UploadActivity extends AppCompatActivity {
                     selectedUrls.add(finalSendList.get(i));
                 }
             }
-        }
+
+            if (selectedUrls.size() > 0)
+            {
+                try {
+                    FirebaseVisionImage visionImage = FirebaseVisionImage.fromFilePath(this,Uri.parse("file://"+selectedUrls.get(0)));
+                    FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
+                    detector.processImage(visionImage).addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+                        @Override
+                        public void onSuccess(FirebaseVisionText firebaseVisionText) {
+                            firebaseVisionText.getText();
+                            if(firebaseVisionText.getTextBlocks().size() > 1)
+                            {
+                                try {
+                                    String bookName = firebaseVisionText.getTextBlocks().get(0).getText() +" "+ firebaseVisionText.getTextBlocks().get(1).getText();
+                                    id_user_upload_book_name.setText(bookName);
+
+                                    int bookSecondLastPosition = firebaseVisionText.getTextBlocks().size() - 1;
+                                    String bookDescription = firebaseVisionText.getTextBlocks().get(bookSecondLastPosition - 1).getText();
+                                    id_user_upload_book_description.setText(bookDescription);
+
+                                }catch (Exception e)
+                                {
+                                    Log.e("UploadActivity", Objects.requireNonNull(e.getMessage()));
+                                }
+                            }
+                        }
+                    })
+                   .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e("UploadActivity",Objects.requireNonNull(e.getMessage()));
+                                }
+                            });
+                }catch(Exception e)
+                {
+                    Log.e("UploadActivity.class",Objects.requireNonNull(e.getMessage()));
+                }
+            }
+            }
     }
 
     private void uploadBook() {
@@ -545,7 +760,7 @@ public class UploadActivity extends AppCompatActivity {
                                 }
                             });
                 } catch (Exception e) {
-                    Log.e(TAG, e.getMessage());
+                    Log.e(TAG,Objects.requireNonNull(e.getMessage()));
                 }
             }
             dialog.show();
@@ -554,13 +769,12 @@ public class UploadActivity extends AppCompatActivity {
         }
     }
 
-
-
     private void loadUserInfo() {
+
         referenceUserCall.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                register = dataSnapshot.getValue(UserRegister.class);
+                register = dataSnapshot.getValue(UserRegisterClass.class);
             }
 
             @Override
@@ -614,7 +828,7 @@ public class UploadActivity extends AppCompatActivity {
                                                     Log.d(TAG, "Contains Link : " + superUploadList);
                                                     btn_upload_book.setVisibility(View.GONE);
                                                     imagesList.setImagesList(superUploadList);
-                                                    if(register.getUserImg().isEmpty() || register.getUserImg()==null)
+                                                    if(register.getUserImg()==null)
                                                     {
                                                         register.setUserImg("https://firebasestorage.googleapis.com/v0/b/shareden.appspot.com/o/usr_img.png?alt=media&token=d9e48a3e-dd3d-4383-957d-5bbc98597972");
                                                     }
@@ -633,8 +847,6 @@ public class UploadActivity extends AppCompatActivity {
 
                                                     referenceUploadBook.child(bookId).setValue(post);
                                                     referenceMyPost.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(bookId).setValue(post);
-                                                } else {
-
                                                 }
                                             }
                                         }
@@ -654,7 +866,7 @@ public class UploadActivity extends AppCompatActivity {
             }
         } else {
             if (UpdateSelectedUrl.size() > 0) {
-                if(register.getUserImg().isEmpty() || register.getUserImg()==null)
+                if(register.getUserImg() == null)
                 {
                     register.setUserImg("https://firebasestorage.googleapis.com/v0/b/shareden.appspot.com/o/usr_img.png?alt=media&token=d9e48a3e-dd3d-4383-957d-5bbc98597972");
                 }
@@ -686,27 +898,53 @@ public class UploadActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode,Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
+            if (intentGetInfo.getBooleanExtra("BookEnableId", false)) {
+                //UpdateUploadedBook();
+                UpdateSelectedUrl.add("file://"+photoFile.getAbsolutePath());
+                UpdateImageAdapter.notifyDataSetChanged();
+            } else {
+                selectedUrls.add(photoFile.getAbsolutePath());
+                UploadAdapter.notifyDataSetChanged();
+                //Bundle bundle = data.getExtras();
+                //Log.d(TAG, String.valueOf(Uri.parse(String.valueOf(bundle.get("data")))));
+            }
+        } else {
+            Log.e(TAG, "Camera data is null");
+        }
+    }
+
+    @Override
     public void onBackPressed() {
-        if(UploadAdapter!=null || UpdateImageAdapter.getItemCount() > 0)
+        if(behavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
         {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Exit");
-            builder.setMessage("Do you really wants to go back ?");
-            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    UploadActivity.super.onBackPressed();
-                }
-            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            }).show();
+            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
         else
         {
-            super.onBackPressed();
+            if(UploadAdapter!=null || UpdateImageAdapter.getItemCount() > 0)
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Exit");
+                builder.setMessage("Do you really wants to go back ?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        UploadActivity.super.onBackPressed();
+                    }
+                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).show();
+            }
+            else
+            {
+                super.onBackPressed();
+            }
         }
     }
 }

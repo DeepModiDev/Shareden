@@ -1,6 +1,6 @@
 package com.deepmodi.shareden.model;
 
-public class UserRegister {
+public class UserRegisterClass {
    private String userName;
    private String userNumber;
    private String userPassword;
@@ -9,28 +9,22 @@ public class UserRegister {
    private String userId;
    private String userImg;
    private String userDesc;
+   private String userFirstTime;
 
-    public UserRegister() {
+    public UserRegisterClass() {
     }
 
-    public UserRegister(String userName, String userNumber, String userPassword, String userGender, String userLevel) {
-        this.userName = userName;
-        this.userNumber = userNumber;
-        this.userPassword = userPassword;
-        this.userGender = userGender;
-        this.userLevel = userLevel;
-    }
-
-    public UserRegister(String userName, String userNumber, String userPassword, String userGender, String userLevel, String userId) {
+    public UserRegisterClass(String userName, String userNumber, String userPassword, String userGender, String userLevel, String userId,String userFirstTime) {
         this.userName = userName;
         this.userNumber = userNumber;
         this.userPassword = userPassword;
         this.userGender = userGender;
         this.userLevel = userLevel;
         this.userId = userId;
+        this.userFirstTime = userFirstTime;
     }
 
-    public UserRegister(String userName, String userNumber, String userPassword, String userGender, String userLevel, String userId, String userImg) {
+    public UserRegisterClass(String userName, String userNumber, String userPassword, String userGender, String userLevel, String userId, String userImg,String userFirstTime) {
         this.userName = userName;
         this.userNumber = userNumber;
         this.userPassword = userPassword;
@@ -38,6 +32,7 @@ public class UserRegister {
         this.userLevel = userLevel;
         this.userId = userId;
         this.userImg = userImg;
+        this.userFirstTime = userFirstTime;
     }
 
     public String getUserDesc() {
@@ -102,5 +97,13 @@ public class UserRegister {
 
     public void setUserLevel(String userLevel) {
         this.userLevel = userLevel;
+    }
+
+    public String getUserFirstTime() {
+        return userFirstTime;
+    }
+
+    public void setUserFirstTime(String userFirstTime) {
+        this.userFirstTime = userFirstTime;
     }
 }

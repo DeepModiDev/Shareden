@@ -10,13 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.deepmodi.shareden.Notifications.Client;
 import com.deepmodi.shareden.ViewHolder.RequestActivityViewHolder;
 import com.deepmodi.shareden.common.Common;
 import com.deepmodi.shareden.model.ChatRequest;
-import com.deepmodi.shareden.ui.APIService;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
@@ -25,9 +22,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Request;
-
-import org.objectweb.asm.Handle;
 
 import io.paperdb.Paper;
 
@@ -38,8 +32,6 @@ public class ActivityUserRequest extends AppCompatActivity {
     protected FirebaseDatabase databaseRequest,databaseAcceptRequest,databaseFollower,databaseFollowing;
     private DatabaseReference referenceRequest,referenceAcceptRequest,referenceFollower,referencefollowing;
     private ChatRequest request;
-
-    APIService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +56,6 @@ public class ActivityUserRequest extends AppCompatActivity {
 
         recyclerView_request = findViewById(R.id.request_recyclerView);
         recyclerView_request.setHasFixedSize(true);
-
-        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
-
 
         /**
          * Load the Requests.
