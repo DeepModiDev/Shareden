@@ -13,15 +13,30 @@
         android:id="@+id/com_name"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:background="@drawable/gradient_color"
-        android:fontFamily="@font/dosis_extrabold"
+        android:background="#FFF"
+        android:fontFamily="@font/raleway_bold"
         android:gravity="center"
         android:text="@string/app_name"
-        android:textColor="#fff"
+        android:textColor="#000"
         android:textSize="25sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/com_timer"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="#FFF"
+        android:fontFamily="@font/raleway_bold"
+        android:gravity="center"
+        android:textColor="#000"
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/com_name"
+        />
 
     <TextView
         android:id="@+id/welcome_text_view"
@@ -36,6 +51,17 @@
         app:layout_constraintTop_toBottomOf="@id/com_name" />
 
     <Button
+        android:id="@+id/btn_send_otp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="send OTP"
+        android:background="@drawable/edit_otp_bg"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+
+    <Button
         android:id="@+id/btn_final_register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,7 +70,7 @@
         android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_send_otp" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout"

@@ -40,8 +40,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.logging.Logger;
+
 import io.paperdb.Paper;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 
 public class HomeFragment extends Fragment implements LifecycleOwner {
 
@@ -110,7 +119,6 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                 //startActivity(new Intent(v.getContext(), ChatActivity.class));
                 NotificationCompat.Builder nb = notificationHelper.getChannel1Builder("Channel 1 is on the way.","This is a channel 1");
                 notificationHelper.getManager().notify(1,nb.build());
-
             }
         });
 
@@ -146,12 +154,11 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                             startActivity(intent);
                         }
                     });
-                    referenceRequestStatus.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(model.getUserPhoneNumber()).addValueEventListener(new ValueEventListener() {
+                    referenceRequestStatus.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(model.getUserPhoneNumber()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             try {
                                 requestStatus = dataSnapshot.getValue(ChatRequest.class);
-                                /*
                                     if (requestStatus.getSenderRequestStatus().equals("false")) {
                                         holder.user_follow_btn.setText("Requested");
 
@@ -160,7 +167,6 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                                     } else if (requestStatus.getSenderRequestStatus().equals("follow")) {
                                         holder.user_follow_btn.setText("Follow");
                                     }
-                                 */
                                 }
                             catch (Exception e)
                             {
@@ -192,11 +198,11 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                                     model.getUserLevel(),
                                     model.getUserImg(),
                                     "false");
-                            referenceRequest.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(model.getUserPhoneNumber()).setValue(request);
+                            referenceRequest.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child("ToRequests").child(model.getUserPhoneNumber()).setValue(request);
                             referenceRequest.child(model.getUserPhoneNumber()).child("MyRequests").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).setValue(request);
-
                         }
                     });
+
 
                     if (model.getUserPhoneNumber().equals(Paper.book().read(Common.USER_FINAL_NUMBER).toString())) {
                         holder.user_follow_btn.setVisibility(View.GONE);
@@ -234,5 +240,10 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void loadNotifications()
+    {
+
     }
 }

@@ -3,9 +3,12 @@ package com.deepmodi.shareden;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.arch.core.executor.TaskExecutor;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.text.SpannableString;
 import android.util.Log;
@@ -38,12 +41,12 @@ import io.paperdb.Paper;
 public class OtpVerificationActivity extends AppCompatActivity {
 
     String USER_NAME,USER_NUMBER,USER_PASSWORD,USER_GENDER,USER_LEVEL;
-    TextView textView_welcome;
+    TextView textView_welcome,com_timer;
     FirebaseDatabase database;
     DatabaseReference reference;
     EditText edit_1,edit_2,edit_3,edit_4,edit_5,edit_6;
 
-    Button btn_final_register;
+    Button btn_final_register,btn_send_otp;
     private String VERIFICATION_ID;
     FirebaseAuth mAuth;
 
@@ -59,6 +62,8 @@ public class OtpVerificationActivity extends AppCompatActivity {
         reference = database.getReference("Users");
 
         textView_welcome = findViewById(R.id.welcome_text_view);
+        com_timer = findViewById(R.id.com_timer);
+        btn_send_otp = findViewById(R.id.btn_send_otp);
 
         Intent intent = getIntent();
         USER_NAME = intent.getStringExtra("userName");
@@ -78,7 +83,15 @@ public class OtpVerificationActivity extends AppCompatActivity {
 
         btn_final_register = findViewById(R.id.btn_final_register);
 
+        reverseTimer(60,com_timer);
         getVerificationCode(USER_NUMBER);
+
+
+        btn_send_otp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
 
         btn_final_register.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,6 +113,23 @@ public class OtpVerificationActivity extends AppCompatActivity {
         });
     }
 
+    public void reverseTimer(int Seconds,final TextView tv){
+
+        new  CountDownTimer(Seconds* 1000+1000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                int seconds = (int) (millisUntilFinished / 1000);
+                int minutes = seconds / 60;
+                seconds = seconds % 60;
+                tv.setText("TIME : " + String.format("%02d", minutes)
+                        + ":" + String.format("%02d", seconds));
+            }
+
+            public void onFinish() {
+                tv.setText("Fail to send Click again.");
+            }
+        }.start();
+    }
     /**
      * THIS FUNCTION WILL BE EXECUTED FIRST.
      * @param userNumber
@@ -181,16 +211,25 @@ public class OtpVerificationActivity extends AppCompatActivity {
 
         @Override
         public void onVerificationFailed(@NonNull FirebaseException e) {
-            resendVerificationCode(USER_NUMBER);
+            Toast.makeText(OtpVerificationActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
             //THIS LINE WILL CALL RE SEND OTP METHOD AND ALL THE FOUR METHOD
                                                 //EXECUTE AGAIN THIS IS A RECURSIVE PROCESS.
         }
+
+        //resendVerificationCode(USER_NUMBER); resendVerificationCode(USER_NUMBER);
 
         @Override
         public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
             VERIFICATION_ID = s;
             super.onCodeSent(s, forceResendingToken);
+            Toast.makeText(OtpVerificationActivity.this, "Code has been sent"+s+" "+forceResendingToken, Toast.LENGTH_SHORT).show();
 
+        }
+
+        @Override
+        public void onCodeAutoRetrievalTimeOut(@NonNull String s) {
+            super.onCodeAutoRetrievalTimeOut(s);
+            Toast.makeText(OtpVerificationActivity.this, "onCodeAutoRetrivalTimeOut", Toast.LENGTH_SHORT).show();
         }
     };
 

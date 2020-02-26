@@ -36,6 +36,7 @@ dependencies {
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
     implementation 'androidx.multidex:multidex:2.0.1'
 
+
     //git lib
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'io.paperdb:paperdb:2.1'
