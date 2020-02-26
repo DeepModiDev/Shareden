@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "528145685375-r1929r03i353isffefjt4gmussm8sb08.apps.googleusercontent.com",
+          "client_id": "528145685375-1doj5652tenmbg8dk1ad0l8e37m25d1m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.deepmodi.shareden",
-            "certificate_hash": "13336103e544bd31e3864992c361e4a486d3148d"
+            "certificate_hash": "89f61dde180e28b9ab24f34c2ddc11c9c8c71d6d"
           }
         },
         {

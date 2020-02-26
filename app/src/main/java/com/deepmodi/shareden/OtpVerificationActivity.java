@@ -83,13 +83,13 @@ public class OtpVerificationActivity extends AppCompatActivity {
 
         btn_final_register = findViewById(R.id.btn_final_register);
 
-        reverseTimer(60,com_timer);
-        getVerificationCode(USER_NUMBER);
 
 
         btn_send_otp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                reverseTimer(60,com_timer);
+                getVerificationCode(USER_NUMBER);
             }
         });
 

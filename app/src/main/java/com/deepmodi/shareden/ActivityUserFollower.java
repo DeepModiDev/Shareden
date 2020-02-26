@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.SpannableString;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +19,15 @@ import android.widget.Toast;
 import com.deepmodi.shareden.ViewHolder.FollowersViewHolder;
 import com.deepmodi.shareden.common.Common;
 import com.deepmodi.shareden.model.ChatRequest;
+import com.firebase.ui.common.ChangeEventType;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
+
+import java.util.logging.Logger;
 
 import io.paperdb.Paper;
 
@@ -56,6 +61,7 @@ public class ActivityUserFollower extends AppCompatActivity {
 
     private void loadData()
     {
+        final int[] counter = {0};
         FirebaseRecyclerOptions options  = new FirebaseRecyclerOptions.Builder<ChatRequest>()
                 .setQuery(referenceFollower.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()),ChatRequest.class)
                 .build();
@@ -63,10 +69,10 @@ public class ActivityUserFollower extends AppCompatActivity {
         adapter = new FirebaseRecyclerAdapter<ChatRequest, FollowersViewHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull FollowersViewHolder holder, int position, @NonNull final ChatRequest model) {
-                holder.followerName.setText(model.getSenderName());
-                Picasso.get().load(model.getSenderImage()).into(holder.followerImage);
-                holder.followerLevel.setText(model.getSenderLevel());
-                holder.btn_unfollow.setOnClickListener(new View.OnClickListener() {
+                holder.id_follower_username.setText(model.getSenderName());
+                Picasso.get().load(model.getSenderImage()).into(holder.id_follower_userImage);
+                holder.id_follower_userlevel.setText(model.getSenderLevel());
+                holder.id_follower_btn_remove.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(ActivityUserFollower.this);
@@ -77,9 +83,8 @@ public class ActivityUserFollower extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 Toast.makeText(ActivityUserFollower.this, "Remove"+model.getSenderName(), Toast.LENGTH_SHORT).show();
                                 referenceFollower.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(model.getSenderNumber()).removeValue();
-                                referenceFollowing.child(model.getSenderNumber()).child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).removeValue();
-                                model.setSenderRequestStatus("follow");
-                                referenceUserequest.child(model.getSenderNumber()).child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).setValue(model);
+                                referenceFollowing.child(model.getSenderNumber()).child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).removeValue();                                //model.setSenderRequestStatus("follow");
+                                //referenceUserequest.child(model.getSenderNumber()).child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).setValue(model);
                                 dialog.dismiss();
                             }
                         }).setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -96,12 +101,20 @@ public class ActivityUserFollower extends AppCompatActivity {
             @NonNull
             @Override
             public FollowersViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(ActivityUserFollower.this).inflate(R.layout.request_item_view_holder,parent,false);
+                View view = LayoutInflater.from(ActivityUserFollower.this).inflate(R.layout.item_view_follower,parent,false);
+                counter[0]++;
                 return new FollowersViewHolder(view);
+            }
+
+            @Override
+            public void onDataChanged() {
+                super.onDataChanged();
+                adapter.notifyDataSetChanged();
             }
         };
         adapter.startListening();
         adapter.notifyDataSetChanged();
+        FirebaseDatabase.getInstance().getReference("Users").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child("userFollowersCount");
         recyclerViewFollower.setAdapter(adapter);
     }
 

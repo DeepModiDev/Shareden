@@ -10,17 +10,16 @@ import com.makeramen.roundedimageview.RoundedImageView;
 
 public class FollowersViewHolder extends RecyclerView.ViewHolder {
 
-    public RoundedImageView followerImage;
-    public TextView followerName;
-    public TextView followerLevel;
-    public TextView btn_unfollow;
+    public RoundedImageView id_follower_userImage;
+    public TextView id_follower_username;
+    public TextView id_follower_userlevel;
+    public TextView id_follower_btn_remove;
 
     public FollowersViewHolder(@NonNull View itemView) {
         super(itemView);
-        followerImage = itemView.findViewById(R.id.id_request_userImage);
-        followerName = itemView.findViewById(R.id.id_request_username);
-        followerLevel = itemView.findViewById(R.id.id_request_userlevel);
-        btn_unfollow = itemView.findViewById(R.id.id_request_btn_accept);
-        btn_unfollow.setText("Remove");
+        id_follower_userImage = itemView.findViewById(R.id.id_follower_userImage);
+        id_follower_username = itemView.findViewById(R.id.id_follower_username);
+        id_follower_userlevel = itemView.findViewById(R.id.id_follower_userlevel);
+        id_follower_btn_remove = itemView.findViewById(R.id.id_follower_btn_remove);
     }
 }
