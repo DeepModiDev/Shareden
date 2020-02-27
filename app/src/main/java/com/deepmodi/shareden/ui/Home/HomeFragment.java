@@ -28,6 +28,7 @@ import com.deepmodi.shareden.FullScreenImageView;
 import com.deepmodi.shareden.HomeActivity;
 import com.deepmodi.shareden.Notifications.NotificationHelper;
 import com.deepmodi.shareden.R;
+import com.deepmodi.shareden.ShowUserFullDetails;
 import com.deepmodi.shareden.UploadActivity;
 import com.deepmodi.shareden.ViewHolder.LatestBookViewHolder;
 import com.deepmodi.shareden.ViewHolder.RecommendationViewHolder;
@@ -48,7 +49,7 @@ import io.paperdb.Paper;
 public class HomeFragment extends Fragment implements LifecycleOwner {
 
     private RecyclerView recyclerView;
-    private DatabaseReference reference, referenceRequest, referenceWhoami, referenceRequestStatus,referenceUserRequest;
+    private DatabaseReference reference, referenceRequest, referenceWhoami,referenceRequestStatus,referenceUserRequest;
     private HomePostImageViewAdapter homePostImageViewAdapter;
     FirebaseDatabase database, databaseRequest, databaseWhoami, databaseRequestStatus,databaseUserRequest;
     HomeViewModel viewModel;
@@ -138,7 +139,7 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
     private void loadList() {
 
         try {
-            FirebaseRecyclerOptions<UserPost> options = new FirebaseRecyclerOptions.Builder<UserPost>()
+            final FirebaseRecyclerOptions<UserPost> options = new FirebaseRecyclerOptions.Builder<UserPost>()
                     .setQuery(reference.orderByChild("postTime"), UserPost.class)
                     .build();
 
@@ -153,16 +154,28 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                     holder.user_book_author.setText(String.format("Book Author : %s", model.getUserBookAuthor()));
                     Picasso.get().load(model.getUserImg()).into(holder.profile_img);
                     //holder.setIsRecyclable(false);
+                    /*
+                    if(model.getUserFollowStatus().equals("false"))
+                    {
+                        holder.user_follow_btn.setText("Requested");
+                    }*/
                     holder.post_time.setText(model.getPostTime());
-                    holder.profile_img.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(v.getContext(), FullScreenImageView.class);
-                            intent.putExtra("fullScreenImageUrl", model.getUserImg());
-                            startActivity(intent);
-                        }
-                    });
+                    if (!model.getUserPhoneNumber().equals(Paper.book().read(Common.USER_FINAL_NUMBER).toString()))
+                    {
+                        holder.profile_img.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(v.getContext(), ShowUserFullDetails.class);
+                                intent.putExtra("userName",model.getUserFullName());
+                                intent.putExtra("userNumber",model.getUserPhoneNumber());
+                                intent.putExtra("userImage",model.getUserImg());
+                                intent.putExtra("userLevel",model.getUserLevel());
+                                startActivity(intent);
+                            }
+                        });
+                    }
 
+                    /*
                     referenceRequestStatus.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(model.getUserPhoneNumber()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -187,37 +200,13 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
 
                         }
                     });
+
+                     */
                     // Log.d("HomeFragment", String.valueOf(model.getUserUploadBookList()));
                     homePostImageViewAdapter = new HomePostImageViewAdapter(getContext(), model.getUserUploadBookList());
                     //homePostImageViewAdapter.setListImages(model.getUserUploadBookList());
                     holder.recyclerView.setAdapter(homePostImageViewAdapter);
                     holder.recyclerView.setHasFixedSize(true);
-
-                    holder.user_follow_btn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            referenceUserRequest.child(model.getUserPhoneNumber()).child("userFollowStatus").setValue("ture");
-                            Toast.makeText(v.getContext(), "" + model.getUserFullName(), Toast.LENGTH_SHORT).show();
-                            request = new ChatRequest(
-                                    Paper.book().read(Common.USER_FINAL_NUMBER).toString(),
-                                    userRegister.getUserName(),
-                                    userRegister.getUserLevel(),
-                                    userRegister.getUserImg(),
-                                    model.getUserPhoneNumber(),
-                                    model.getUserFullName(),
-                                    model.getUserLevel(),
-                                    model.getUserImg(),
-                                    "false");
-                            FirebaseDatabase.getInstance().getReference("Users").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child("userFollowStatus").setValue("false");
-                            referenceRequest.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child("ToRequests").child(model.getUserPhoneNumber()).setValue(request);
-                            referenceRequest.child(model.getUserPhoneNumber()).child("MyRequests").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).setValue(request);
-                        }
-                    });
-
-
-                    if (model.getUserPhoneNumber().equals(Paper.book().read(Common.USER_FINAL_NUMBER).toString())) {
-                        holder.user_follow_btn.setVisibility(View.GONE);
-                    }
                 }
 
                 @NonNull
@@ -226,10 +215,14 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                     View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user_home_recycler_container, parent, false);
                     return new LatestBookViewHolder(view);
                 }
+
+
             };
             adapter.startListening();
             adapter.notifyDataSetChanged();
             recyclerView.setAdapter(adapter);
+
+            Log.d("HomeFragment",String.valueOf(adapter.getItemCount()));
         } catch (Exception e) {
             e.printStackTrace();
         }

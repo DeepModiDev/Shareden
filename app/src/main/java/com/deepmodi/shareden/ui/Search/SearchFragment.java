@@ -79,10 +79,9 @@ public class SearchFragment extends Fragment {
         edit_text_search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH)
-                {
-                    //searchData = edit_text_search.getText().toString();
-                   /// loadData(searchData);
+                if(actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    searchData = edit_text_search.getText().toString();
+                    loadData(searchData);
                     return true;
                 }
                 return false;
@@ -92,33 +91,29 @@ public class SearchFragment extends Fragment {
         databaseSearch = FirebaseDatabase.getInstance();
         referenceSearch  = databaseSearch.getReference("UserPost");
 
-        //loadDefaultData();
+        loadDefaultData();
         swipe_referesh_search.setColorSchemeResources(R.color.colorAccent);
         swipe_referesh_search.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 swipe_referesh_search.setRefreshing(false);
-                //loadDefaultData();
+                loadDefaultData();
             }
         });
-
         return v;
     }
 
-    private void loadDefaultData()
-    {
+    private void loadDefaultData() {
         FirebaseRecyclerOptions optionsDefaut = new FirebaseRecyclerOptions.Builder<UserPost>()
-              .setQuery(referenceSearch,UserPost.class)
+              .setQuery(referenceSearch.orderByChild("userBookName"),UserPost.class)
                .build();
 
         adapterDefault = new FirebaseRecyclerAdapter<UserPost, LatestBookViewHolder>(optionsDefaut) {
             @Override
             protected void onBindViewHolder(@NonNull LatestBookViewHolder holder, int position, @NonNull final UserPost model) {
                 holder.user_name.setText(model.getUserFullName());
-                holder.user_follow_btn.setText(model.getUserFollowStatus());
                 holder.user_level.setText(model.getUserLevel());
                 holder.user_book_description.setText(model.getUserBookDescription());
-                holder.user_follow_btn.setVisibility(View.GONE);
                 holder.user_book_name.setText(String.format("Book Name : %s", model.getUserBookName()));
                 holder.user_book_author.setText(String.format("Book Author : %s", model.getUserBookAuthor()));
                 Picasso.get().load(model.getUserImg()).into(holder.profile_img);
@@ -144,14 +139,13 @@ public class SearchFragment extends Fragment {
                 return new LatestBookViewHolder(view);
             }
         };
-       // adapterDefault.startListening();
-       // adapterDefault.notifyDataSetChanged();
-       // recyclerView_search.setAdapter(adapterDefault);
+       adapterDefault.startListening();
+       adapterDefault.notifyDataSetChanged();
+       recyclerView_search.setAdapter(adapterDefault);
 
     }
 
-    private void loadData(String search)
-    {
+    private void loadData(String search) {
         FirebaseRecyclerOptions optionSearch = new FirebaseRecyclerOptions.Builder<UserPost>()
                 .setQuery(referenceSearch.orderByChild("userBookName").startAt(search).endAt(search+"\uf8ff"),UserPost.class)
                 .build();
@@ -160,10 +154,8 @@ public class SearchFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull LatestBookViewHolder holder, int position, @NonNull final UserPost model) {
                 holder.user_name.setText(model.getUserFullName());
-                holder.user_follow_btn.setText(model.getUserFollowStatus());
                 holder.user_level.setText(model.getUserLevel());
                 holder.user_book_description.setText(model.getUserBookDescription());
-                holder.user_follow_btn.setVisibility(View.GONE);
                 holder.user_book_name.setText(String.format("Book Name : %s", model.getUserBookName()));
                 holder.user_book_author.setText(String.format("Book Author : %s", model.getUserBookAuthor()));
                 Picasso.get().load(model.getUserImg()).into(holder.profile_img);
@@ -189,9 +181,8 @@ public class SearchFragment extends Fragment {
                 return new LatestBookViewHolder(view);
             }
         };
-      //  adapterSearch.startListening();
-      //  adapterSearch.notifyDataSetChanged();
-      //  recyclerView_search.setAdapter(adapterSearch);
-
+      adapterSearch.startListening();
+      adapterSearch.notifyDataSetChanged();
+      recyclerView_search.setAdapter(adapterSearch);
     }
 }

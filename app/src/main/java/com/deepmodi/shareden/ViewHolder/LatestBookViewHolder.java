@@ -22,7 +22,6 @@ public class LatestBookViewHolder extends RecyclerView.ViewHolder {
    public TextView user_name;
    public TextView user_level;
    public TextView user_book_name,user_book_author,user_book_description,post_time;
-   public Button user_follow_btn;
    public RecyclerView recyclerView;
 
     public LatestBookViewHolder(@NonNull final View itemView) {
@@ -32,10 +31,10 @@ public class LatestBookViewHolder extends RecyclerView.ViewHolder {
         user_book_description = itemView.findViewById(R.id.id_book_description);
         user_book_name = itemView.findViewById(R.id.id_book_name);
         user_book_author = itemView.findViewById(R.id.id_book_author);
-        user_follow_btn = itemView.findViewById(R.id.btn_follow_me);
         user_level = itemView.findViewById(R.id.id_user_level);
         recyclerView = itemView.findViewById(R.id.post_home_images_recyclerView);
         post_time = itemView.findViewById(R.id.id_post_time);
         recyclerView.setHasFixedSize(true);
     }
+
 }

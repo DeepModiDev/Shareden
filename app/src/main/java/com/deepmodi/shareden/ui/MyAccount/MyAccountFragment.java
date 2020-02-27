@@ -97,6 +97,7 @@ public class MyAccountFragment extends Fragment implements LifecycleOwner
         private List<String> myIds = new ArrayList<>();
         private List<UserPost> post = new ArrayList<>();
         UserRegisterClass updatedRegister;
+        private TextView follower_textView,following_textView,requests_textView,number_of_books_donated;
 
     public static MyAccountFragment newInstance() {
         return new MyAccountFragment();
@@ -111,6 +112,8 @@ public class MyAccountFragment extends Fragment implements LifecycleOwner
 
         updatedRegister = new UserRegisterClass();
 
+        number_of_books_donated = view.findViewById(R.id.number_of_books_donated);
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         reference = database.getReference("Users").child((String)Paper.book().read(Common.USER_FINAL_NUMBER));
 
@@ -121,9 +124,9 @@ public class MyAccountFragment extends Fragment implements LifecycleOwner
         referenceStorage = storage.getReference("UsersImages");
 
         UploadItemClickListner itemClickListner;
-        TextView follower_textView = view.findViewById(R.id.follower_textView);
-        TextView following_textView = view.findViewById(R.id.following_textView);
-        TextView requests_textView = view.findViewById(R.id.requests_textView);
+        follower_textView = view.findViewById(R.id.follower_textView);
+         following_textView = view.findViewById(R.id.following_textView);
+         requests_textView = view.findViewById(R.id.requests_textView);
 
         follower_textView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -189,6 +192,8 @@ public class MyAccountFragment extends Fragment implements LifecycleOwner
                 startActivity(intent);
             }
         });
+
+        getTotalitem();
         return view;
     }
 
@@ -364,5 +369,56 @@ public class MyAccountFragment extends Fragment implements LifecycleOwner
                     Toast.makeText(getActivity(), "" + exception, Toast.LENGTH_SHORT).show();
                 }
             }
+    }
+
+    private void getTotalitem()
+    {
+        FirebaseDatabase.getInstance().getReference("Followers").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                follower_textView.setText(String.valueOf(dataSnapshot.getChildrenCount())+"\n"+"Followers");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        FirebaseDatabase.getInstance().getReference("Following").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                following_textView.setText(String.valueOf(dataSnapshot.getChildrenCount())+"\n"+"Followings");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        FirebaseDatabase.getInstance().getReference("UserRequests").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child("MyRequests").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                requests_textView.setText(String.valueOf(dataSnapshot.getChildrenCount())+"\n"+"Requests");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        FirebaseDatabase.getInstance().getReference("MyPost").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                number_of_books_donated.setText(String.valueOf(dataSnapshot.getChildrenCount())+" books donated");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

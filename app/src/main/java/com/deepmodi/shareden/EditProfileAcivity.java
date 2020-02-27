@@ -53,7 +53,7 @@ import io.paperdb.Paper;
 
 public class EditProfileAcivity extends AppCompatActivity {
 
-    EditText edit_user_name,edit_user_occupation,edit_user_phone,edit_user_bio;
+    EditText edit_user_name,edit_user_occupation,edit_user_phone,edit_user_bio,id_user_upload_stationary_type;
     Button btn_update;
     RoundedImageView profile_img;
     ImageView btn_select_image_imageview;
@@ -96,10 +96,11 @@ public class EditProfileAcivity extends AppCompatActivity {
         edit_user_occupation = findViewById(R.id.edit_user_occupation);
         edit_user_phone = findViewById(R.id.edit_user_phone);
 
-            edit_user_name.setText(intent.getStringExtra("userName"));
-            edit_user_bio.setText(intent.getStringExtra("userDesc"));
-            edit_user_phone.setText(intent.getStringExtra("userNumber"));
-            edit_user_occupation.setText(intent.getStringExtra("userLevel"));
+
+        edit_user_name.setText(intent.getStringExtra("userName"));
+        edit_user_bio.setText(intent.getStringExtra("userDesc"));
+        edit_user_phone.setText(intent.getStringExtra("userNumber"));
+        edit_user_occupation.setText(intent.getStringExtra("userLevel"));
 
         btn_update = findViewById(R.id.btn_update);
         profile_img = findViewById(R.id.profile_img);

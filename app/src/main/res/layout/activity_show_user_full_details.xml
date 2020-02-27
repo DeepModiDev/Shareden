@@ -7,4 +7,205 @@
     android:layout_height="match_parent"
     tools:context=".ShowUserFullDetails">
 
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/profile_img"
+        android:layout_width="110dp"
+        android:layout_height="150dp"
+        android:layout_margin="25dp"
+        android:background="@android:color/transparent"
+        android:elevation="5dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/usr_img"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:riv_corner_radius="25dp" />
+
+    <Button
+        android:id="@+id/btn_send_follow_request"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:background="@drawable/bg_btn_donnetion"
+        android:elevation="10dp"
+        android:text="Follow"
+        android:textColor="#FFF"
+        android:textSize="16sp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:fontFamily="@font/raleway_bold"
+        android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/profile_img"
+        app:layout_constraintTop_toTopOf="@+id/profile_img" />
+
+    <TextView
+        android:id="@+id/no_book_donated"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/bg_btn_donnetion"
+        android:elevation="10dp"
+        android:fontFamily="@font/raleway_bold"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="20 books donated"
+        android:textColor="#FFF"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/profile_img"
+        app:layout_constraintTop_toBottomOf="@+id/btn_send_follow_request" />
+
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profile_img">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp">
+
+            <TextView
+                android:id="@+id/edituser_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:fontFamily="@font/raleway_bold"
+                android:paddingLeft="20dp"
+                android:text="Name"
+                android:textColor="#C0C0C0"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/display_user_name"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="20dp"
+                android:background="#F9F9F9"
+                android:fontFamily="@font/raleway_bold"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:text="User Name"
+                android:textColor="#011A0E"
+                android:textCursorDrawable="@drawable/edit_upload_bg"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edituser_name" />
+
+            <TextView
+                android:id="@+id/edituser_occupation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/raleway_bold"
+                android:paddingLeft="20dp"
+                android:text="Occupation"
+                android:textColor="#C0C0C0"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/display_user_name" />
+
+            <TextView
+                android:id="@+id/display_user_occupation"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="20dp"
+                android:background="#F9F9F9"
+                android:fontFamily="@font/raleway_bold"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:text="User occupation"
+                android:textColor="#011A0E"
+                android:textCursorDrawable="@drawable/edit_upload_bg"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edituser_occupation" />
+
+            <TextView
+                android:id="@+id/edituser_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/raleway_bold"
+                android:paddingLeft="20dp"
+                android:text="Phone number"
+                android:textColor="#C0C0C0"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/display_user_occupation" />
+
+            <TextView
+                android:id="@+id/display_user_phone"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="20dp"
+                android:background="#F9F9F9"
+                android:fontFamily="@font/raleway_bold"
+                android:gravity="center_vertical"
+                android:inputType="number"
+                android:paddingLeft="10dp"
+                android:text="User phone number"
+                android:textColor="#011A0E"
+                android:textCursorDrawable="@drawable/edit_upload_bg"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edituser_phone" />
+
+            <TextView
+                android:id="@+id/edituser_bio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/raleway_bold"
+                android:paddingLeft="20dp"
+                android:text="Bio"
+                android:textColor="#C0C0C0"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/display_user_phone" />
+
+            <TextView
+                android:id="@+id/display_user_bio"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="20dp"
+                android:background="#F9F9F9"
+                android:cursorVisible="true"
+                android:fontFamily="@font/raleway_bold"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:text="User bio"
+                android:textColor="#011A0E"
+                android:textCursorDrawable="@drawable/edit_upload_bg"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edituser_bio" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -82,6 +82,8 @@ import com.google.firebase.storage.UploadTask;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -106,11 +108,12 @@ public class UploadActivity extends AppCompatActivity {
     EditText id_user_upload_book_name;
     EditText id_user_upload_book_author;
     EditText id_user_upload_book_description;
+    EditText id_user_upload_stationary_type;
     FloatingActionButton fab_attach;
     BottomSheetBehavior behavior;
     ImageButton img_close;
     Spinner select_path_spinner;
-
+    private ConstraintLayout constraint_parent_2;
     private ImagesList imagesList, imagesUpdatedList;
 
     private ArrayList<String> directories;
@@ -123,7 +126,7 @@ public class UploadActivity extends AppCompatActivity {
     GridView gridView;
     String mSelectedImage;
 
-    private String[] select_book_type ={"Select your book type","Novel","Engineering","Medical","Commerce","Arts","11th Std","12th Std","Other"};
+    private String[] select_book_type ={"Select your book type","Computer Science & Eng","Electrical engineering","Mechanical Engineering","Civil Engineering","Chemical engineering","EC","MBA","MCA","Medical"};
 
     List<String> selectedUrls = new ArrayList<>();
     List<String> UpdateSelectedUrl = new ArrayList<>();
@@ -140,7 +143,6 @@ public class UploadActivity extends AppCompatActivity {
     RecyclerView create_post_grid_recyclerView;
     RecyclerView.LayoutManager createPost_grid_manager;
     CreatePostRecyclerViewAdapter createPostRecyclerViewAdapter;
-
 
     protected FirebaseDatabase databaseUploadBook;
     protected DatabaseReference referenceUploadBook;
@@ -163,7 +165,7 @@ public class UploadActivity extends AppCompatActivity {
     private String user_selected_book_type;
     private BottomSheetDialog bottomSheetDialog;
     private ConstraintLayout parentLayout;
-
+    AppCompatSpinner spinner_select_book_level;
     File photoFile = null;
     private String capturedImagePath;
     public static final int CAMERA_REQUEST_CODE = 1234;
@@ -197,6 +199,8 @@ public class UploadActivity extends AppCompatActivity {
         referenceMyPost = databaseMyPost.getReference("MyPost");
         finalUpdateUploadList = new ArrayList<>();
 
+        constraint_parent_2 = findViewById(R.id.constraint_parent_2);
+
         createPost_grid_manager = new GridLayoutManager(this, 3);
         create_post_grid_recyclerView = findViewById(R.id.gridView);
         create_post_grid_recyclerView.setHasFixedSize(true);
@@ -212,7 +216,9 @@ public class UploadActivity extends AppCompatActivity {
         id_user_upload_book_name = findViewById(R.id.id_user_upload_book_name);
         id_user_upload_book_author = findViewById(R.id.id_user_upload_book_author);
         id_user_upload_book_description = findViewById(R.id.id_user_upload_book_description);
-        AppCompatSpinner spinner_select_book_level = findViewById(R.id.appCompatSpinner);
+        id_user_upload_stationary_type = findViewById(R.id.id_user_upload_stationary_type);
+
+        spinner_select_book_level = findViewById(R.id.appCompatSpinner);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,select_book_type);
         spinner_select_book_level.setAdapter(adapter);
@@ -352,6 +358,7 @@ public class UploadActivity extends AppCompatActivity {
         btn_upload_book.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                btn_upload_book.setVisibility(View.GONE);
                 if (!id_user_upload_book_name.getText().toString().isEmpty()) {
                     if (!id_user_upload_book_author.getText().toString().isEmpty()) {
 
@@ -389,6 +396,7 @@ public class UploadActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        SharingChooser(this);
 
     }
 
@@ -742,7 +750,8 @@ public class UploadActivity extends AppCompatActivity {
                                                         imagesList.getImagesList(),
                                                         id_user_upload_book_name.getText().toString(),
                                                         id_user_upload_book_author.getText().toString(),
-                                                        Paper.book().read(Common.USER_FINAL_NUMBER).toString());
+                                                        Paper.book().read(Common.USER_FINAL_NUMBER).toString(),
+                                                        user_selected_book_type);
 
                                             }
 
@@ -915,6 +924,35 @@ public class UploadActivity extends AppCompatActivity {
                 Toast.makeText(this, "You must need to select at least one image.", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private void SharingChooser(final UploadActivity activity) {
+        final CharSequence[] sequences = {"want to Share book","want to share Stationary"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle("Options for sharing...");
+        builder.setCancelable(false);
+        builder.setItems(sequences, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (sequences[which].equals("want to Share book"))
+                {
+                     id_user_upload_book_name.setVisibility(View.VISIBLE);
+                     id_user_upload_book_author.setVisibility(View.VISIBLE);
+                     id_user_upload_book_description.setVisibility(View.VISIBLE);
+                     id_user_upload_stationary_type.setVisibility(View.GONE);
+                }else if(sequences[which].equals("want to share Stationary"))
+                {
+                    id_user_upload_book_name.setVisibility(View.GONE);
+                    id_user_upload_book_author.setVisibility(View.GONE);
+                    id_user_upload_book_description.setVisibility(View.GONE);
+                    id_user_upload_stationary_type.setVisibility(View.VISIBLE);
+                    spinner_select_book_level.setVisibility(View.GONE);
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
     }
 
     @Override
