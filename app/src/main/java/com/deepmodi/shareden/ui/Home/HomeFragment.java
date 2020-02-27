@@ -48,9 +48,9 @@ import io.paperdb.Paper;
 public class HomeFragment extends Fragment implements LifecycleOwner {
 
     private RecyclerView recyclerView;
-    private DatabaseReference reference, referenceRequest, referenceWhoami, referenceRequestStatus;
+    private DatabaseReference reference, referenceRequest, referenceWhoami, referenceRequestStatus,referenceUserRequest;
     private HomePostImageViewAdapter homePostImageViewAdapter;
-    FirebaseDatabase database, databaseRequest, databaseWhoami, databaseRequestStatus;
+    FirebaseDatabase database, databaseRequest, databaseWhoami, databaseRequestStatus,databaseUserRequest;
     HomeViewModel viewModel;
     private ChatRequest request, requestStatus;
     private UserRegisterClass userRegister;
@@ -58,6 +58,7 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
     private FirebaseRecyclerAdapter<UserPost, LatestBookViewHolder> adapterData;
     private NotificationHelper notificationHelper;
     private SwipeRefreshLayout swipeRefreshLayout;
+
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -69,7 +70,7 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
 
         View v = inflater.inflate(R.layout.home_fragment, container, false);
 
-        //Paper init
+        //Paper initz
         Paper.init(v.getContext());
 
         //init Notificati on helper
@@ -86,6 +87,10 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
 
         databaseRequestStatus = FirebaseDatabase.getInstance();
         referenceRequestStatus = databaseRequestStatus.getReference("UserRequests");
+
+        databaseUserRequest = FirebaseDatabase.getInstance();
+        referenceUserRequest = databaseUserRequest.getReference("Users");
+
 
         //userRegister = new UserRegister();
         //requestStatus = new ChatRequest();
@@ -128,14 +133,13 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
         });
         loadDetails();
         return v;
-
     }
 
     private void loadList() {
 
         try {
             FirebaseRecyclerOptions<UserPost> options = new FirebaseRecyclerOptions.Builder<UserPost>()
-                    .setQuery(reference, UserPost.class)
+                    .setQuery(reference.orderByChild("postTime"), UserPost.class)
                     .build();
 
             final FirebaseRecyclerAdapter<UserPost, LatestBookViewHolder> adapter
@@ -148,6 +152,7 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                     holder.user_book_name.setText(String.format("Book Name : %s", model.getUserBookName()));
                     holder.user_book_author.setText(String.format("Book Author : %s", model.getUserBookAuthor()));
                     Picasso.get().load(model.getUserImg()).into(holder.profile_img);
+                    //holder.setIsRecyclable(false);
                     holder.post_time.setText(model.getPostTime());
                     holder.profile_img.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -157,6 +162,7 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                             startActivity(intent);
                         }
                     });
+
                     referenceRequestStatus.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(model.getUserPhoneNumber()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -164,7 +170,6 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                                 requestStatus = dataSnapshot.getValue(ChatRequest.class);
                                     if (requestStatus.getSenderRequestStatus().equals("false")) {
                                         holder.user_follow_btn.setText("Requested");
-
                                     } else if (requestStatus.getSenderRequestStatus().equals("true")) {
                                         holder.user_follow_btn.setText("Following");
                                     } else if (requestStatus.getSenderRequestStatus().equals("follow")) {
@@ -187,11 +192,14 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                     //homePostImageViewAdapter.setListImages(model.getUserUploadBookList());
                     holder.recyclerView.setAdapter(homePostImageViewAdapter);
                     holder.recyclerView.setHasFixedSize(true);
+
                     holder.user_follow_btn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            referenceUserRequest.child(model.getUserPhoneNumber()).child("userFollowStatus").setValue("ture");
                             Toast.makeText(v.getContext(), "" + model.getUserFullName(), Toast.LENGTH_SHORT).show();
-                            request = new ChatRequest(Paper.book().read(Common.USER_FINAL_NUMBER).toString(),
+                            request = new ChatRequest(
+                                    Paper.book().read(Common.USER_FINAL_NUMBER).toString(),
                                     userRegister.getUserName(),
                                     userRegister.getUserLevel(),
                                     userRegister.getUserImg(),
@@ -200,6 +208,7 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                                     model.getUserLevel(),
                                     model.getUserImg(),
                                     "false");
+                            FirebaseDatabase.getInstance().getReference("Users").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child("userFollowStatus").setValue("false");
                             referenceRequest.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child("ToRequests").child(model.getUserPhoneNumber()).setValue(request);
                             referenceRequest.child(model.getUserPhoneNumber()).child("MyRequests").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).setValue(request);
                         }

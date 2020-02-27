@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,25 +10,24 @@
         android:id="@+id/relative_laout_chat_room"
         android:layout_width="match_parent"
         android:layout_height="45dp"
+        android:background="@color/cardview_light_background"
+        android:elevation="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:elevation="10dp"
-        android:background="@color/cardview_light_background"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/text_view_userName"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="User name"
-            android:padding="10dp"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:textColor="#000"
-            android:maxLines="1"
             android:ellipsize="end"
             android:fontFamily="@font/raleway_bold"
+            android:gravity="center"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:text="User name"
+            android:textColor="#000"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -39,10 +37,32 @@
         android:id="@+id/load_user_chat"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="1dp"
+        android:layout_marginTop="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relative_laout_chat_room" />
+        app:layout_constraintTop_toBottomOf="@+id/relative_laout_chat_room"
+        tools:itemCount="20"
+        tools:listitem="@layout/chat_view_holder_con" />
 
+    <EditText
+        android:id="@+id/edit_text_enter_message"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:hint="Message..."
+        android:paddingLeft="10dp"
+        android:layout_marginRight="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btn_send_message"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        app:srcCompat="@drawable/ic_send_white"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/edit_text_enter_message" />
 </androidx.constraintlayout.widget.ConstraintLayout>

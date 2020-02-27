@@ -217,7 +217,7 @@ public class EditProfileAcivity extends AppCompatActivity {
     }
 
     private void loadUserInformation(DatabaseReference query) {
-        registerClass = new UserRegisterClass();
+
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

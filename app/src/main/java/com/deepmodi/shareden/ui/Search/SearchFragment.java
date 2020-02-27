@@ -81,8 +81,8 @@ public class SearchFragment extends Fragment {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId == EditorInfo.IME_ACTION_SEARCH)
                 {
-                    searchData = edit_text_search.getText().toString();
-                    loadData(searchData);
+                    //searchData = edit_text_search.getText().toString();
+                   /// loadData(searchData);
                     return true;
                 }
                 return false;
@@ -92,13 +92,13 @@ public class SearchFragment extends Fragment {
         databaseSearch = FirebaseDatabase.getInstance();
         referenceSearch  = databaseSearch.getReference("UserPost");
 
-        loadDefaultData();
+        //loadDefaultData();
         swipe_referesh_search.setColorSchemeResources(R.color.colorAccent);
         swipe_referesh_search.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 swipe_referesh_search.setRefreshing(false);
-                loadDefaultData();
+                //loadDefaultData();
             }
         });
 
@@ -144,9 +144,9 @@ public class SearchFragment extends Fragment {
                 return new LatestBookViewHolder(view);
             }
         };
-        adapterDefault.startListening();
-        adapterDefault.notifyDataSetChanged();
-        recyclerView_search.setAdapter(adapterDefault);
+       // adapterDefault.startListening();
+       // adapterDefault.notifyDataSetChanged();
+       // recyclerView_search.setAdapter(adapterDefault);
 
     }
 
@@ -189,9 +189,9 @@ public class SearchFragment extends Fragment {
                 return new LatestBookViewHolder(view);
             }
         };
-        adapterSearch.startListening();
-        adapterSearch.notifyDataSetChanged();
-        recyclerView_search.setAdapter(adapterSearch);
+      //  adapterSearch.startListening();
+      //  adapterSearch.notifyDataSetChanged();
+      //  recyclerView_search.setAdapter(adapterSearch);
 
     }
 }

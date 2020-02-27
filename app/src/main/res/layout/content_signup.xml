@@ -178,6 +178,35 @@
                         android:textColor="@color/black" />
 
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/temp_textInput_others"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:textColorHint="#cfcfcf"
+                    app:boxStrokeColor="#000000"
+                    app:hintEnabled="true"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/password_text_input_layout_again">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_text_signup_unique_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@android:color/transparent"
+                        android:drawableRight="@drawable/ic_person_light_black"
+                        android:hint="Unique ID"
+                        android:inputType="text"
+                        android:singleLine="true"
+                        android:textColor="#000"
+                        android:textSize="16sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+
             <RadioGroup
                 android:id="@+id/radio_group"
                 android:layout_width="match_parent"
@@ -187,7 +216,7 @@
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/password_text_input_layout_again">
+                app:layout_constraintTop_toBottomOf="@+id/temp_textInput_others">
 
                 <RadioButton
                     android:id="@+id/radio_male"
@@ -311,9 +340,38 @@
                     android:onClick="checkLevelButton"
                     android:text="Others"
                     android:textColor="#000" />
+
             </RadioGroup>
 
-            <com.google.android.material.button.MaterialButton
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/temp_textInput_others_users"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:textColorHint="#cfcfcf"
+                    app:boxStrokeColor="#000000"
+                    app:hintEnabled="true"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/radio_group_level">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_text_signup_others"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@android:color/transparent"
+                        android:drawableRight="@drawable/ic_person_light_black"
+                        android:hint="Enter occupations"
+                        android:inputType="text"
+                        android:singleLine="true"
+                        android:textColor="#000"
+                        android:textSize="16sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_register"
                 android:layout_width="150dp"
                 android:layout_height="50dp"
@@ -328,7 +386,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/sign_in_user"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/radio_group_level"
+                app:layout_constraintTop_toBottomOf="@+id/temp_textInput_others_users"
                 app:rippleColor="@color/general_green" />
 
             <androidx.appcompat.widget.AppCompatButton

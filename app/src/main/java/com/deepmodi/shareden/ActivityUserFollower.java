@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -37,6 +38,7 @@ public class ActivityUserFollower extends AppCompatActivity {
     protected FirebaseDatabase databaseFollower,databaseFollowing,databaseUserRequest;
     private DatabaseReference referenceFollower,referenceFollowing,referenceUserequest;
     private RecyclerView recyclerViewFollower;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     @Override
@@ -55,6 +57,16 @@ public class ActivityUserFollower extends AppCompatActivity {
         databaseUserRequest = FirebaseDatabase.getInstance();
         referenceUserequest  = databaseUserRequest.getReference("UserRequests");
         recyclerViewFollower = findViewById(R.id.recyclerView_follower);
+
+        swipeRefreshLayout = findViewById(R.id.swipe_referesh_follower);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(false);
+                loadData();
+            }
+        });
 
         loadData();
     }

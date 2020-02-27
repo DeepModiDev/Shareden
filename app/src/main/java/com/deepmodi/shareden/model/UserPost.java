@@ -17,6 +17,8 @@ public class UserPost {
     private String userBookName;
     private String userBookAuthor;
     private String userPhoneNumber;
+    private String selectedBookType;
+
 
     public UserPost() {
     }
@@ -74,6 +76,21 @@ public class UserPost {
         this.userBookName = userBookName;
         this.userBookAuthor = userBookAuthor;
         this.userPhoneNumber = userPhoneNumber;
+    }
+
+    public UserPost(String userFullName, String userLevel, String userImg, String userBookDescription, String userFollowStatus, String postId, String postTime, List<String> userUploadBookList, String userBookName, String userBookAuthor, String userPhoneNumber, String selectedBookType) {
+        this.userFullName = userFullName;
+        this.userLevel = userLevel;
+        this.userImg = userImg;
+        this.userBookDescription = userBookDescription;
+        this.userFollowStatus = userFollowStatus;
+        this.postId = postId;
+        this.postTime = postTime;
+        this.userUploadBookList = userUploadBookList;
+        this.userBookName = userBookName;
+        this.userBookAuthor = userBookAuthor;
+        this.userPhoneNumber = userPhoneNumber;
+        this.selectedBookType = selectedBookType;
     }
 
     public String getUserPhoneNumber() {
@@ -163,5 +180,13 @@ public class UserPost {
 
     public void setUserFollowStatus(String userFollowStatus) {
         this.userFollowStatus = userFollowStatus;
+    }
+
+    public String getSelectedBookType() {
+        return selectedBookType;
+    }
+
+    public void setSelectedBookType(String selectedBookType) {
+        this.selectedBookType = selectedBookType;
     }
 }

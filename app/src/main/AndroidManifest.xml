@@ -27,12 +27,12 @@
         android:roundIcon="@drawable/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ShowUserFullDetails"></activity>
         <activity
             android:name=".ChatRoom"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            tools:ignore="LockedOrientationActivity">
-        </activity>
+            tools:ignore="LockedOrientationActivity"></activity>
         <activity
             android:name=".ForgotPassword"
             android:theme="@style/AppTheme.NoActionBar" />

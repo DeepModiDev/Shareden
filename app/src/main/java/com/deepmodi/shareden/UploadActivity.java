@@ -93,8 +93,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.logging.Handler;
 import java.util.logging.Logger;
-
 import id.zelory.compressor.Compressor;
 import io.paperdb.Paper;
 
@@ -123,7 +123,7 @@ public class UploadActivity extends AppCompatActivity {
     GridView gridView;
     String mSelectedImage;
 
-    private String[] select_book_type ={"Select your book type","Novel","Engineering","Medical","Commerce","Arts","11th Std","12th Std"};
+    private String[] select_book_type ={"Select your book type","Novel","Engineering","Medical","Commerce","Arts","11th Std","12th Std","Other"};
 
     List<String> selectedUrls = new ArrayList<>();
     List<String> UpdateSelectedUrl = new ArrayList<>();
@@ -160,7 +160,7 @@ public class UploadActivity extends AppCompatActivity {
     private int p;
     private UserPost post;
     private MyPostView postView;
-
+    private String user_selected_book_type;
     private BottomSheetDialog bottomSheetDialog;
     private ConstraintLayout parentLayout;
 
@@ -181,7 +181,7 @@ public class UploadActivity extends AppCompatActivity {
         requestStoragePermission();
         Paper.init(this);
         calendar = Calendar.getInstance();
-        simpleDateFormat = new SimpleDateFormat("EEE , dd-mm-yyyy , hh:mm");
+        simpleDateFormat = new SimpleDateFormat("EEE , dd-MM-yyyy , hh:mm");
 
         //recyclerView setup
         databaseUploadBook = FirebaseDatabase.getInstance();
@@ -221,6 +221,7 @@ public class UploadActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(UploadActivity.this, ""+select_book_type[position], Toast.LENGTH_SHORT).show();
+                user_selected_book_type = select_book_type[position];
             }
 
             @Override
@@ -256,6 +257,7 @@ public class UploadActivity extends AppCompatActivity {
             bookId = postView.getPostId();
         }
          */
+
         //bottom sheet view
         CoordinatorLayout coordinatorLayout = findViewById(R.id.coordinator);
         View constraintLayout = coordinatorLayout.findViewById(R.id.bottom_sheet);
@@ -286,6 +288,8 @@ public class UploadActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.e(TAG,Objects.requireNonNull(e.getMessage()));
         }
+
+        //This will be display bottom sheet which contains 2 options like select camera or select image from gallery.
 
         fab_attach.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -453,7 +457,6 @@ public class UploadActivity extends AppCompatActivity {
         return image;
     }
 
-
     //Methods for capture image and save images
 
     private void requestStoragePermission() {
@@ -513,10 +516,8 @@ public class UploadActivity extends AppCompatActivity {
 
     private void loadGridView(String selectedDirectory) {
         final ArrayList<String> imageUrls = FileSearch.getFilePaths(selectedDirectory, this);
-
         createPostRecyclerViewAdapter = new CreatePostRecyclerViewAdapter(imageUrls, appends, getSelectedListData(imageUrls.size()), galleryImageView, UploadActivity.this, progressBar, finalSendList);
         create_post_grid_recyclerView.setAdapter(createPostRecyclerViewAdapter);
-
         try {
             if (imageUrls.size() > 0) {
                 setImage(imageUrls.get(0), galleryImageView, "file://");
@@ -585,6 +586,8 @@ public class UploadActivity extends AppCompatActivity {
                 if (UpdateSelectedUrl.size() > 0)
                 {
                     try {
+
+                        //Firebase vision for recognizing text from the image.
                         FirebaseVisionImage visionImage = FirebaseVisionImage.fromFilePath(this,Uri.parse("file://"+UpdateSelectedUrl.get(0)));
                         FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
                         detector.processImage(visionImage).addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
@@ -748,6 +751,7 @@ public class UploadActivity extends AppCompatActivity {
                                             Toast.makeText(UploadActivity.this, "Image Uploaded Successfully.", Toast.LENGTH_SHORT).show();
                                             btn_upload_book.setClickable(false);
                                             btn_upload_book.setText("Done");
+                                            btn_upload_book.setVisibility(View.GONE);
                                         }
                                     });
                                 }
@@ -826,7 +830,6 @@ public class UploadActivity extends AppCompatActivity {
                                                 if (!superUploadList.contains(finalUpdateUploadList.get(i))) {
                                                     superUploadList.add(finalUpdateUploadList.get(i));
                                                     Log.d(TAG, "Contains Link : " + superUploadList);
-                                                    btn_upload_book.setVisibility(View.GONE);
                                                     imagesList.setImagesList(superUploadList);
                                                     if(register.getUserImg()==null)
                                                     {
@@ -843,10 +846,12 @@ public class UploadActivity extends AppCompatActivity {
                                                             imagesList.getImagesList(),
                                                             id_user_upload_book_name.getText().toString(),
                                                             id_user_upload_book_author.getText().toString(),
-                                                            Paper.book().read(Common.USER_FINAL_NUMBER).toString());
+                                                            Paper.book().read(Common.USER_FINAL_NUMBER).toString(),
+                                                            user_selected_book_type);
 
                                                     referenceUploadBook.child(bookId).setValue(post);
                                                     referenceMyPost.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(bookId).setValue(post);
+                                                    btn_upload_book.setVisibility(View.GONE);
                                                 }
                                             }
                                         }
@@ -871,7 +876,7 @@ public class UploadActivity extends AppCompatActivity {
                     register.setUserImg("https://firebasestorage.googleapis.com/v0/b/shareden.appspot.com/o/usr_img.png?alt=media&token=d9e48a3e-dd3d-4383-957d-5bbc98597972");
                 }
                 imagesList.setImagesList(UpdateSelectedUrl);
-                UserPost post = new UserPost(
+               /* UserPost post = new UserPost(
                         register.getUserName(),
                         register.getUserLevel(),
                         register.getUserImg(),
@@ -883,6 +888,21 @@ public class UploadActivity extends AppCompatActivity {
                         id_user_upload_book_name.getText().toString(),
                         id_user_upload_book_author.getText().toString(),
                         Paper.book().read(Common.USER_FINAL_NUMBER).toString());
+                */
+
+                UserPost post = new UserPost(
+                        register.getUserName(),
+                        register.getUserLevel(),
+                        register.getUserImg(),
+                        id_user_upload_book_description.getText().toString(),
+                        "temp",
+                        bookId,
+                        simpleDateFormat.format(calendar.getTime()),
+                        imagesList.getImagesList(),
+                        id_user_upload_book_name.getText().toString(),
+                        id_user_upload_book_author.getText().toString(),
+                        Paper.book().read(Common.USER_FINAL_NUMBER).toString(),
+                        user_selected_book_type);
 
                 referenceUploadBook.child(bookId).setValue(post);
                 referenceMyPost.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(bookId).setValue(post).addOnSuccessListener(new OnSuccessListener<Void>() {

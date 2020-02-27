@@ -36,17 +36,12 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
         recyclerViewChat = findViewById(R.id.chat_recyclerView);
         Paper.init(this);
-
         databaseChat = FirebaseDatabase.getInstance();
         referenceChat = databaseChat.getReference("Following");
-
         text_view_not_following = findViewById(R.id.text_view_not_following);
-
         loadData();
-
     }
 
     private void loadData()
@@ -76,6 +71,10 @@ public class ChatActivity extends AppCompatActivity {
                        @Override
                        public void onClick(View v, int position, boolean isLongClick) {
                            Toast.makeText(ChatActivity.this, ""+model.getReceiverName(), Toast.LENGTH_SHORT).show();
+                           Intent intent = new Intent(ChatActivity.this,ChatRoom.class);
+                           intent.putExtra("senderNumber",model.getSenderNumber());
+                           intent.putExtra("receiverNumber",model.getReceiverNumber());
+                           startActivity(intent);
                        }
                    });
                 }
