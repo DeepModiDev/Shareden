@@ -39,6 +39,156 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.appcompat.widget.Toolbar>
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView3">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp">
+
+
+            <TextView
+                android:id="@+id/edituser_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:fontFamily="@font/raleway_bold"
+                android:paddingLeft="20dp"
+                android:text="Name"
+                android:textColor="#C0C0C0"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <EditText
+                android:id="@+id/edit_user_name"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="20dp"
+                android:background="#F9F9F9"
+                android:fontFamily="@font/raleway_bold"
+                android:paddingLeft="10dp"
+                android:text="User Name"
+                android:textColor="#011A0E"
+                android:textCursorDrawable="@drawable/edit_upload_bg"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edituser_name" />
+
+            <TextView
+                android:id="@+id/edituser_occupation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:fontFamily="@font/raleway_bold"
+                android:paddingLeft="20dp"
+                android:text="Occupation"
+                android:textColor="#C0C0C0"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_user_name" />
+
+            <EditText
+                android:id="@+id/edit_user_occupation"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="20dp"
+                android:background="#F9F9F9"
+                android:fontFamily="@font/raleway_bold"
+                android:paddingLeft="10dp"
+                android:text="User occupation"
+                android:textColor="#011A0E"
+                android:textCursorDrawable="@drawable/edit_upload_bg"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edituser_occupation" />
+
+            <TextView
+                android:id="@+id/edituser_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:fontFamily="@font/raleway_bold"
+                android:paddingLeft="20dp"
+                android:text="Phone number"
+                android:textColor="#C0C0C0"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_user_occupation" />
+
+            <EditText
+                android:id="@+id/edit_user_phone"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="20dp"
+                android:background="#F9F9F9"
+                android:fontFamily="@font/raleway_bold"
+                android:inputType="number"
+                android:paddingLeft="10dp"
+                android:text="User phone number"
+                android:textColor="#011A0E"
+                android:textCursorDrawable="@drawable/edit_upload_bg"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edituser_phone" />
+
+            <TextView
+                android:id="@+id/edituser_bio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:fontFamily="@font/raleway_bold"
+                android:paddingLeft="20dp"
+                android:text="Bio"
+                android:textColor="#C0C0C0"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_user_phone" />
+
+            <EditText
+                android:id="@+id/edit_user_bio"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="20dp"
+                android:background="#F9F9F9"
+                android:cursorVisible="true"
+                android:fontFamily="@font/raleway_bold"
+                android:paddingLeft="10dp"
+                android:text="User bio"
+                android:textColor="#011A0E"
+                android:textCursorDrawable="@drawable/edit_upload_bg"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edituser_bio" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/profile_img"
@@ -81,141 +231,6 @@
                 app:srcCompat="@drawable/ic_camera" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
-
-
-    <TextView
-        android:id="@+id/edituser_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:fontFamily="@font/raleway_bold"
-        android:paddingLeft="20dp"
-        android:text="Name"
-        android:textColor="#C0C0C0"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_img" />
-
-    <EditText
-        android:id="@+id/edit_user_name"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:fontFamily="@font/raleway_bold"
-        android:textColor="#011A0E"
-        android:textSize="18sp"
-        android:text="User Name"
-        android:paddingLeft="10dp"
-        android:background="#F9F9F9"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="20dp"
-        android:textCursorDrawable="@drawable/edit_upload_bg"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edituser_name" />
-
-    <TextView
-        android:id="@+id/edituser_occupation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:fontFamily="@font/raleway_bold"
-        android:paddingLeft="20dp"
-        android:text="Occupation"
-        android:textColor="#C0C0C0"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_user_name" />
-
-    <EditText
-        android:id="@+id/edit_user_occupation"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:fontFamily="@font/raleway_bold"
-        android:textColor="#011A0E"
-        android:textSize="18sp"
-        android:text="User occupation"
-        android:paddingLeft="10dp"
-        android:background="#F9F9F9"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="20dp"
-        android:textCursorDrawable="@drawable/edit_upload_bg"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edituser_occupation" />
-
-    <TextView
-        android:id="@+id/edituser_phone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:fontFamily="@font/raleway_bold"
-        android:paddingLeft="20dp"
-        android:text="Phone number"
-        android:textColor="#C0C0C0"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_user_occupation" />
-
-    <EditText
-        android:id="@+id/edit_user_phone"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:fontFamily="@font/raleway_bold"
-        android:textColor="#011A0E"
-        android:textSize="18sp"
-        android:text="User phone number"
-        android:paddingLeft="10dp"
-        android:background="#F9F9F9"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="20dp"
-        android:inputType="number"
-        android:textCursorDrawable="@drawable/edit_upload_bg"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edituser_phone" />
-
-
-    <TextView
-        android:id="@+id/edituser_bio"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:fontFamily="@font/raleway_bold"
-        android:paddingLeft="20dp"
-        android:text="Bio"
-        android:textColor="#C0C0C0"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_user_phone" />
-
-    <EditText
-        android:id="@+id/edit_user_bio"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:fontFamily="@font/raleway_bold"
-        android:textColor="#011A0E"
-        android:textSize="18sp"
-        android:text="User bio"
-        android:paddingLeft="10dp"
-        android:background="#F9F9F9"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="20dp"
-        android:cursorVisible="true"
-        android:textCursorDrawable="@drawable/edit_upload_bg"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edituser_bio" />
-
 
     <Button
         android:id="@+id/btn_update"

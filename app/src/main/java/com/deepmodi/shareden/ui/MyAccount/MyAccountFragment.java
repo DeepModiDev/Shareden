@@ -29,6 +29,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -96,6 +97,7 @@ public class MyAccountFragment extends Fragment implements LifecycleOwner
         private List<String> myIds = new ArrayList<>();
         private List<UserPost> post = new ArrayList<>();
         UserRegisterClass updatedRegister;
+
     public static MyAccountFragment newInstance() {
         return new MyAccountFragment();
     }
@@ -106,6 +108,8 @@ public class MyAccountFragment extends Fragment implements LifecycleOwner
         final View view = inflater.inflate(R.layout.my_account_fragment, container, false);
         //init database
         Paper.init(view.getContext());
+
+        updatedRegister = new UserRegisterClass();
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         reference = database.getReference("Users").child((String)Paper.book().read(Common.USER_FINAL_NUMBER));
@@ -154,13 +158,13 @@ public class MyAccountFragment extends Fragment implements LifecycleOwner
         TextView user_phone_number_id = view.findViewById(R.id.profile_user_phone_number);
         user_phone_number_id.setText(Paper.book().read(Common.USER_FINAL_NUMBER).toString());
         final MyAccountFragment activity = this;
+        /*
         profile_img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(v.getContext(), EditUserActivity.class));
             }
-        });
-
+        });*/
        loadUserInformation(reference);
        //loadMyPost();
 
@@ -177,7 +181,12 @@ public class MyAccountFragment extends Fragment implements LifecycleOwner
                 Toast.makeText(v.getContext(), "All the informations are saved.", Toast.LENGTH_LONG).show();
                 btn_save.setText("Changes Are Saved");
                 */
-                startActivity(new Intent(v.getContext(),EditProfileAcivity.class));
+                Intent intent = new Intent(v.getContext(),EditProfileAcivity.class);
+                intent.putExtra("userName",updatedRegister.getUserName());
+                intent.putExtra("userDesc",updatedRegister.getUserDesc());
+                intent.putExtra("userNumber",updatedRegister.getUserNumber());
+                intent.putExtra("userLevel",updatedRegister.getUserLevel());
+                startActivity(intent);
             }
         });
         return view;

@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +30,7 @@ import com.deepmodi.shareden.Notifications.NotificationHelper;
 import com.deepmodi.shareden.R;
 import com.deepmodi.shareden.UploadActivity;
 import com.deepmodi.shareden.ViewHolder.LatestBookViewHolder;
+import com.deepmodi.shareden.ViewHolder.RecommendationViewHolder;
 import com.deepmodi.shareden.common.Common;
 import com.deepmodi.shareden.model.ChatRequest;
 import com.deepmodi.shareden.model.UserPost;
@@ -40,17 +42,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.logging.Logger;
-
 import io.paperdb.Paper;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 
 public class HomeFragment extends Fragment implements LifecycleOwner {
 
@@ -64,6 +57,7 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
     private ImageButton btn_chat;
     private FirebaseRecyclerAdapter<UserPost, LatestBookViewHolder> adapterData;
     private NotificationHelper notificationHelper;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -78,7 +72,7 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
         //Paper init
         Paper.init(v.getContext());
 
-        //init Notification helper
+        //init Notificati on helper
         notificationHelper = new NotificationHelper(getActivity());
         //firebase init
         database = FirebaseDatabase.getInstance();
@@ -97,6 +91,7 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
         //requestStatus = new ChatRequest();
 
         RecyclerView suggestion_recyclerView = v.findViewById(R.id.suggestion_recyclerView);
+        swipeRefreshLayout = v.findViewById(R.id.swipe_referesh_home);
 
         final ImageButton float_create_post = v.findViewById(R.id.create_post);
         RecyclerView.LayoutManager manager = new LinearLayoutManager(v.getContext());
@@ -116,13 +111,21 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
         btn_chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //startActivity(new Intent(v.getContext(), ChatActivity.class));
-                NotificationCompat.Builder nb = notificationHelper.getChannel1Builder("Channel 1 is on the way.","This is a channel 1");
-                notificationHelper.getManager().notify(1,nb.build());
+                startActivity(new Intent(v.getContext(), ChatActivity.class));
+                //NotificationCompat.Builder nb = notificationHelper.getChannel1Builder("Channel 1 is on the way.","This is a channel 1");
+                //notificationHelper.getManager().notify(1,nb.build());
             }
         });
 
         loadList();
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(false);
+                loadList();
+            }
+        });
         loadDetails();
         return v;
 
@@ -179,7 +182,6 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
 
                         }
                     });
-
                     // Log.d("HomeFragment", String.valueOf(model.getUserUploadBookList()));
                     homePostImageViewAdapter = new HomePostImageViewAdapter(getContext(), model.getUserUploadBookList());
                     //homePostImageViewAdapter.setListImages(model.getUserUploadBookList());
@@ -242,8 +244,31 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
         }
     }
 
-    private void loadNotifications()
-    {
+    private void loadNotifications() {
 
+    }
+
+    private void loadSuggestions() {
+        FirebaseDatabase databaseQuicAction = FirebaseDatabase.getInstance();
+        DatabaseReference refQuick = databaseQuicAction.getReference("QuickAccess");
+
+        FirebaseRecyclerOptions optionsQuick = new FirebaseRecyclerOptions.Builder<UserPost>()
+                .setQuery(refQuick,UserPost.class)
+                .build();
+
+
+        final FirebaseRecyclerAdapter<UserPost, RecommendationViewHolder> adapter
+                = new FirebaseRecyclerAdapter<UserPost, RecommendationViewHolder>(optionsQuick) {
+            @Override
+            protected void onBindViewHolder(@NonNull RecommendationViewHolder holder, int position, @NonNull UserPost model) {
+
+            }
+
+            @NonNull
+            @Override
+            public RecommendationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                return null;
+            }
+        };
     }
 }

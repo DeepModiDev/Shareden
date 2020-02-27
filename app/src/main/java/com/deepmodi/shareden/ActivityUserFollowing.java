@@ -58,6 +58,7 @@ public class ActivityUserFollowing extends AppCompatActivity {
                     public void onClick(View v) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(ActivityUserFollowing.this);
                         builder.setCancelable(false);
+                        builder.setMessage("Do you really wants to unfollow "+model.getReceiverName()+"?");
                         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {

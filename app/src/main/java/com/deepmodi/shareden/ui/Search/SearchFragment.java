@@ -12,11 +12,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -49,6 +52,8 @@ public class SearchFragment extends Fragment {
     private HomePostImageViewAdapter homePostImageViewAdapter;
     private FirebaseRecyclerAdapter<UserPost, LatestBookViewHolder> adapterDefault;
     private FirebaseRecyclerAdapter<UserPost,LatestBookViewHolder> adapterSearch;
+    private SwipeRefreshLayout swipe_referesh_search;
+
 
     public static SearchFragment newInstance() {
         return new SearchFragment();
@@ -61,6 +66,7 @@ public class SearchFragment extends Fragment {
         recyclerView_search = v.findViewById(R.id.search_book);
         edit_text_search = v.findViewById(R.id.edit_text_search);
         search_btn = v.findViewById(R.id.btn_click_search);
+        swipe_referesh_search = v.findViewById(R.id.swipe_referesh_search);
 
         search_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,10 +75,33 @@ public class SearchFragment extends Fragment {
                 loadData(searchData);
             }
         });
+
+        edit_text_search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_SEARCH)
+                {
+                    searchData = edit_text_search.getText().toString();
+                    loadData(searchData);
+                    return true;
+                }
+                return false;
+            }
+
+        });
         databaseSearch = FirebaseDatabase.getInstance();
         referenceSearch  = databaseSearch.getReference("UserPost");
 
         loadDefaultData();
+        swipe_referesh_search.setColorSchemeResources(R.color.colorAccent);
+        swipe_referesh_search.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipe_referesh_search.setRefreshing(false);
+                loadDefaultData();
+            }
+        });
+
         return v;
     }
 
@@ -89,6 +118,7 @@ public class SearchFragment extends Fragment {
                 holder.user_follow_btn.setText(model.getUserFollowStatus());
                 holder.user_level.setText(model.getUserLevel());
                 holder.user_book_description.setText(model.getUserBookDescription());
+                holder.user_follow_btn.setVisibility(View.GONE);
                 holder.user_book_name.setText(String.format("Book Name : %s", model.getUserBookName()));
                 holder.user_book_author.setText(String.format("Book Author : %s", model.getUserBookAuthor()));
                 Picasso.get().load(model.getUserImg()).into(holder.profile_img);
@@ -133,6 +163,7 @@ public class SearchFragment extends Fragment {
                 holder.user_follow_btn.setText(model.getUserFollowStatus());
                 holder.user_level.setText(model.getUserLevel());
                 holder.user_book_description.setText(model.getUserBookDescription());
+                holder.user_follow_btn.setVisibility(View.GONE);
                 holder.user_book_name.setText(String.format("Book Name : %s", model.getUserBookName()));
                 holder.user_book_author.setText(String.format("Book Author : %s", model.getUserBookAuthor()));
                 Picasso.get().load(model.getUserImg()).into(holder.profile_img);

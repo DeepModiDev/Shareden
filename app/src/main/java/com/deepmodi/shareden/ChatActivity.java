@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.deepmodi.shareden.Interface.RequestItemClickListner;
@@ -29,6 +30,7 @@ public class ChatActivity extends AppCompatActivity {
     DatabaseReference referenceChat;
     RecyclerView recyclerViewChat;
     FirebaseRecyclerAdapter<ChatRequest,ChatViewHolder> adapterChat;
+    TextView text_view_not_following;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,8 @@ public class ChatActivity extends AppCompatActivity {
 
         databaseChat = FirebaseDatabase.getInstance();
         referenceChat = databaseChat.getReference("Following");
+
+        text_view_not_following = findViewById(R.id.text_view_not_following);
 
         loadData();
 
@@ -56,6 +60,7 @@ public class ChatActivity extends AppCompatActivity {
             adapterChat = new FirebaseRecyclerAdapter<ChatRequest, ChatViewHolder>(options) {
                 @Override
                 protected void onBindViewHolder(@NonNull ChatViewHolder holder, int position, @NonNull final ChatRequest model) {
+                    text_view_not_following.setVisibility(View.GONE);
                     Picasso.get().load(model.getReceiverImage()).into(holder.imageChatUser);
                     holder.chatUserName.setText(model.getReceiverName());
                     holder.chatUserLevel.setText(model.getReceiverLevel());

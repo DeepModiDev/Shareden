@@ -6,8 +6,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="5dp"
     app:cardCornerRadius="0dp"
-    android:layout_marginTop="1dp"
-    >
+    android:layout_marginTop="2dp"
+    android:layout_marginLeft="1dp"
+    android:layout_marginRight="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

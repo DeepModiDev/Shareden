@@ -68,6 +68,7 @@ public class EditProfileAcivity extends AppCompatActivity {
     private List<UserPost> post = new ArrayList<>();
     private ProgressDialog progressDialog;
     private UploadImageAsyncTask uploadImageAsyncTask;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +77,8 @@ public class EditProfileAcivity extends AppCompatActivity {
 
         //Paper init
         Paper.init(this);
+
+        intent = getIntent();
 
         //firebase init
         data_base = FirebaseDatabase.getInstance();
@@ -92,6 +95,11 @@ public class EditProfileAcivity extends AppCompatActivity {
         edit_user_name = findViewById(R.id.edit_user_name);
         edit_user_occupation = findViewById(R.id.edit_user_occupation);
         edit_user_phone = findViewById(R.id.edit_user_phone);
+
+            edit_user_name.setText(intent.getStringExtra("userName"));
+            edit_user_bio.setText(intent.getStringExtra("userDesc"));
+            edit_user_phone.setText(intent.getStringExtra("userNumber"));
+            edit_user_occupation.setText(intent.getStringExtra("userLevel"));
 
         btn_update = findViewById(R.id.btn_update);
         profile_img = findViewById(R.id.profile_img);
@@ -120,7 +128,7 @@ public class EditProfileAcivity extends AppCompatActivity {
         profile_img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                openImageChooser(EditProfileAcivity.this);
             }
         });
 
@@ -137,7 +145,14 @@ public class EditProfileAcivity extends AppCompatActivity {
                 registerClass.setUserName(edit_user_name.getText().toString());
                 registerClass.setUserLevel(edit_user_occupation.getText().toString());
                 registerClass.setUserDesc(edit_user_bio.getText().toString());
+                registerClass.setUserFirstTime("true");
                 referenceEdit.setValue(registerClass);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        finish();
+                    }
+                },500);
                // updateUserInformation(referenceMyPostEdit);
             }
         });
@@ -186,6 +201,7 @@ public class EditProfileAcivity extends AppCompatActivity {
                             .compressToFile(finalImage);
                     //String resultUri = result.getUri().toString();
                     if (resultUri != null) {
+                        Picasso.get().load(compressedImage).error(R.drawable.usr_img).placeholder(R.drawable.usr_img).into(profile_img);
                         progressDialog = new ProgressDialog(this);
                         uploadImageAsyncTask = new UploadImageAsyncTask();
                         uploadImageAsyncTask.execute(compressedImage);
@@ -225,11 +241,11 @@ public class EditProfileAcivity extends AppCompatActivity {
 
             }
         });
-        edit_user_name.setText(registerClass.getUserName());
-        edit_user_phone.setText(registerClass.getUserNumber());
+        //edit_user_name.setText(registerClass.getUserName());
+        //edit_user_phone.setText(registerClass.getUserNumber());
         edit_user_phone.setEnabled(false);
-        edit_user_occupation.setText(registerClass.getUserLevel());
-        edit_user_bio.setText(registerClass.getUserDesc());
+        //edit_user_occupation.setText(registerClass.getUserLevel());
+        //edit_user_bio.setText(registerClass.getUserDesc());
     }
 
    /* private void updateUserInformation(final DatabaseReference reference) {
@@ -312,6 +328,7 @@ public class EditProfileAcivity extends AppCompatActivity {
                                     result = uri.toString();
                                     Paper.book().write(Common.USER_IMAGE_LINK, result);
                                     registerClass.setUserImg(result);
+
                                     referenceEdit.setValue(registerClass);
                                 }
                             });
@@ -339,7 +356,6 @@ public class EditProfileAcivity extends AppCompatActivity {
         protected void onPostExecute(String uri) {
             super.onPostExecute(uri);
             Toast.makeText(EditProfileAcivity.this, "Image uploaded successfully.", Toast.LENGTH_SHORT).show();
-
         }
     }
 }

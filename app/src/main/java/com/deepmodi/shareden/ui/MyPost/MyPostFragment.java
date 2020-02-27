@@ -8,6 +8,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -41,6 +43,7 @@ public class MyPostFragment extends Fragment {
     private RecyclerView recyclerView_my_posts;
     private HomePostImageViewAdapter homePostImageViewAdapter;
     private FirebaseRecyclerAdapter<MyPostView,MyPostViewHolder> adapterMyPost;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public static MyPostFragment newInstance()
     {
@@ -71,6 +74,15 @@ public class MyPostFragment extends Fragment {
         referenceGeneralPost = databaseGeneralPost.getReference("UserPost");
         recyclerView_my_posts = view.findViewById(R.id.myPost_recylcerView_main);
 
+        swipeRefreshLayout = view.findViewById(R.id.swipe_referesh_my_post);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(false);
+                loadMyPost();
+            }
+        });
         loadMyPost();
 
         return view;
