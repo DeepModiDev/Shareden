@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -36,10 +37,11 @@ public class ShowUserFullDetails extends AppCompatActivity {
     private String userPhoneNumber;
     private String usrBio;
     private String usrNoBooksDonated;
-    private ChatRequest request;
+    private ChatRequest request,newRequest;
     private RoundedImageView roundedImageView;
     FirebaseDatabase databaseRequest;
     DatabaseReference referenceRequest;
+
 
     TextView no_book_donated,display_user_name,display_user_occupation,display_user_phone,display_user_bio;
 
@@ -86,11 +88,62 @@ public class ShowUserFullDetails extends AppCompatActivity {
                         usrProfileName,
                         usrProfileLevel,
                         usrProfileImage,
-                        "false");
-                btn_send_follow_request.setText("Requested");
+                        "Requested");
+                //btn_send_follow_request.setText("Requested");
                 //FirebaseDatabase.getInstance().getReference("UserPost").child(model.getPostId()).child("userFollowStatus").setValue("false");
                 referenceRequest.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child("ToRequests").child(userPhoneNumber).setValue(request);
                 referenceRequest.child(userPhoneNumber).child("MyRequests").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).setValue(request);
+            }
+        });
+
+        FirebaseDatabase.getInstance().getReference("UserRequests").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child("ToRequests").child(userPhoneNumber)
+                .addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                  String temp = dataSnapshot.child("senderRequestStatus").getValue(String.class);
+                if(TextUtils.isEmpty(temp))
+                {
+                    FirebaseDatabase.getInstance().getReference("Following").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.hasChild(userPhoneNumber))
+                            {
+                                btn_send_follow_request.setText("Following");
+                                btn_send_follow_request.setEnabled(false);
+                            }
+                            else
+                            {
+                                btn_send_follow_request.setText("Follow");
+                                btn_send_follow_request.setEnabled(true);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }else
+                {
+                    btn_send_follow_request.setText(temp);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        FirebaseDatabase.getInstance().getReference("MyPost").child(userPhoneNumber).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                no_book_donated.setText(String.valueOf(dataSnapshot.getChildrenCount())+" books donated");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
@@ -100,7 +153,6 @@ public class ShowUserFullDetails extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 registerUser = dataSnapshot.getValue(UserRegisterClass.class);
-
             }
 
             @Override

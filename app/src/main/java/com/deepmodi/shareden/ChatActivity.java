@@ -74,6 +74,7 @@ public class ChatActivity extends AppCompatActivity {
                            Intent intent = new Intent(ChatActivity.this,ChatRoom.class);
                            intent.putExtra("senderNumber",model.getSenderNumber());
                            intent.putExtra("receiverNumber",model.getReceiverNumber());
+                           intent.putExtra("userName",model.getReceiverName());
                            startActivity(intent);
                        }
                    });

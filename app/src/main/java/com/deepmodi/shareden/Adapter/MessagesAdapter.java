@@ -44,7 +44,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
         if(fromMessageType.equals("text"))
         {
-            holder.receiverMessage.setVisibility(View.INVISIBLE);
+            holder.receiverMessage.setVisibility(View.GONE);
             holder.senderMessage.setVisibility(View.VISIBLE);
 
             if(fromUserId.equals(currentSenderId))
@@ -55,7 +55,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
             }
             else
                 {
-                holder.senderMessage.setVisibility(View.INVISIBLE);
+                holder.senderMessage.setVisibility(View.GONE);
                 holder.receiverMessage.setVisibility(View.VISIBLE);
                 holder.receiverMessage.setBackgroundResource(R.drawable.right_bubble);
                 holder.receiverMessage.setGravity(Gravity.LEFT);

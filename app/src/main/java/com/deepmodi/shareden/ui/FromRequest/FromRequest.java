@@ -93,6 +93,7 @@ public class FromRequest extends Fragment {
                                 //FirebaseDatabase.getInstance().getReference("Followers").child(model.getSenderNumber()).child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).setValue(request);
                                 //FirebaseDatabase.getInstance().getReference("Following").child(model.getSenderNumber()).child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).setValue(request);
                                 //FirebaseDatabase.getInstance().getReference("UserRequests").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child("MyRequests").child(model.getSenderNumber()).removeValue();
+
                                 FirebaseDatabase.getInstance().getReference("Followers").child(model.getReceiverNumber()).child(model.getSenderNumber()).setValue(model);
                                 FirebaseDatabase.getInstance().getReference("Following").child(model.getSenderNumber()).child(model.getReceiverNumber()).setValue(model);
                                 FirebaseDatabase.getInstance().getReference("UserRequests").child(model.getSenderNumber()).child("ToRequests").child(model.getReceiverNumber()).removeValue();

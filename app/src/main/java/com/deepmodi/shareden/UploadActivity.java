@@ -23,6 +23,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.PostProcessor;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
@@ -783,7 +784,6 @@ public class UploadActivity extends AppCompatActivity {
     }
 
     private void loadUserInfo() {
-
         referenceUserCall.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -804,7 +804,7 @@ public class UploadActivity extends AppCompatActivity {
         if (finalSendList.size() > 0) {
             // finalUpdateUploadList.addAll(UpdateSelectedUrl);
             for (p = 0; p < finalSendList.size(); p++) {
-               //Log.d(TAG, "Contains Sub link : " + finalSendList.get(p));
+                //Log.d(TAG, "Contains Sub link : " + finalSendList.get(p));
                 try {
                     //Log.d(TAG, "INSIDE THE FOR LOOP");
                     final File finalImage = FileUtil.from(this, Uri.parse("file://" + finalSendList.get(p)));
@@ -884,7 +884,86 @@ public class UploadActivity extends AppCompatActivity {
                 {
                     register.setUserImg("https://firebasestorage.googleapis.com/v0/b/shareden.appspot.com/o/usr_img.png?alt=media&token=d9e48a3e-dd3d-4383-957d-5bbc98597972");
                 }
-                imagesList.setImagesList(UpdateSelectedUrl);
+               // imagesList.setImagesList(UpdateSelectedUrl);
+
+                    // finalUpdateUploadList.addAll(UpdateSelectedUrl);
+                    for (p = 0; p < UpdateSelectedUrl.size(); p++) {
+                        //Log.d(TAG, "Contains Sub link : " + UpdateSelectedUrl.get(p));
+                        try {
+                            //Log.d(TAG, "INSIDE THE FOR LOOP");
+                            if(UpdateSelectedUrl.get(p).contains("file://")) {
+                                final File finalImage = FileUtil.from(this, Uri.parse("file://" + UpdateSelectedUrl.get(p)));
+
+                                //Log.d(TAG,"selected images final list "+selectedUrls.get(i));
+                                File compressedImage = new Compressor(this)
+                                        .setQuality(75)
+                                        .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                                        .compressToFile(finalImage);
+
+                                final StorageReference ref = referenceStorage.child("images/" + Paper.book().read(Common.USER_FINAL_NUMBER)).child(String.valueOf(System.currentTimeMillis()));
+                                ref.putFile(Uri.fromFile(compressedImage))
+                                        .addOnProgressListener(
+                                                new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                                    @Override
+                                                    public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                                                        double progress = (100.00 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                                                        dialog.setMessage("Loading : " + (float) progress + "%");
+                                                        dialog.setCancelable(false);
+                                                        dialog.show();
+                                                        //Log.d(TAG, "INSIDE THE ON PREGRESS LISTNER");
+                                                    }
+                                                })
+                                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                dialog.dismiss();
+                                                ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                    @Override
+                                                    public void onSuccess(Uri uri) {
+                                                        finalUpdateUploadList.add(uri.toString());
+                                                        for (int i = 0; i < finalUpdateUploadList.size(); i++) {
+                                                            if (!superUploadList.contains(finalUpdateUploadList.get(i))) {
+                                                                superUploadList.add(finalUpdateUploadList.get(i));
+                                                                Log.d(TAG, "Contains Link : " + superUploadList);
+                                                                imagesList.setImagesList(superUploadList);
+                                                                if (register.getUserImg() == null) {
+                                                                    register.setUserImg("https://firebasestorage.googleapis.com/v0/b/shareden.appspot.com/o/usr_img.png?alt=media&token=d9e48a3e-dd3d-4383-957d-5bbc98597972");
+                                                                }
+                                                                UserPost post = new UserPost(
+                                                                        register.getUserName(),
+                                                                        register.getUserLevel(),
+                                                                        register.getUserImg(),
+                                                                        id_user_upload_book_description.getText().toString(),
+                                                                        "temp",
+                                                                        bookId,
+                                                                        simpleDateFormat.format(calendar.getTime()),
+                                                                        imagesList.getImagesList(),
+                                                                        id_user_upload_book_name.getText().toString(),
+                                                                        id_user_upload_book_author.getText().toString(),
+                                                                        Paper.book().read(Common.USER_FINAL_NUMBER).toString(),
+                                                                        user_selected_book_type);
+
+                                                                referenceUploadBook.child(bookId).setValue(post);
+                                                                referenceMyPost.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(bookId).setValue(post);
+                                                                btn_upload_book.setVisibility(View.GONE);
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                dialog.dismiss();
+                                                // Log.d(TAG, "INSIDE THE FAILER LISTNER");
+                                            }
+                                        });
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
                /* UserPost post = new UserPost(
                         register.getUserName(),
                         register.getUserLevel(),
@@ -896,8 +975,7 @@ public class UploadActivity extends AppCompatActivity {
                         imagesList.getImagesList(),
                         id_user_upload_book_name.getText().toString(),
                         id_user_upload_book_author.getText().toString(),
-                        Paper.book().read(Common.USER_FINAL_NUMBER).toString());
-                */
+                        Paper.book().read(Common.USER_FINAL_NUMBER).toString()); */
 
                 UserPost post = new UserPost(
                         register.getUserName(),
@@ -931,7 +1009,6 @@ public class UploadActivity extends AppCompatActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("Options for sharing...");
-        builder.setCancelable(false);
         builder.setItems(sequences, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -974,6 +1051,116 @@ public class UploadActivity extends AppCompatActivity {
         }
     }
 
+
+
+
+
+    private void UploadStationary(){
+        final ProgressDialog dialog = new ProgressDialog(this);
+        if (selectedUrls.size() > 0) {
+            final int time = (int) System.currentTimeMillis();
+            //Log.d(TAG, "INSIDE THE IF FUNCTION");
+            for (int i = 0; i < selectedUrls.size(); i++) {
+                try {
+                    //Log.d(TAG, "INSIDE THE FOR LOOP");
+                    final File finalImage = FileUtil.from(this, Uri.parse("file://" + selectedUrls.get(i)));
+                    Log.d(TAG, "selected images final list " + selectedUrls.get(i));
+                    File compressedImage = new Compressor(this)
+                            .setQuality(75)
+                            .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                            .compressToFile(finalImage);
+
+                    final StorageReference ref = referenceStorage.child("images/" + Paper.book().read(Common.USER_FINAL_NUMBER)).child(String.valueOf(System.currentTimeMillis()));
+                    ref.putFile(Uri.fromFile(compressedImage))
+                            .addOnProgressListener(
+                                    new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                                            try {
+                                                double progress = (100.00 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                                                dialog.setMessage("Loading : " + (float) progress + "%");
+                                                dialog.show();
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+
+                                            //Log.d(TAG, "INSIDE THE ON PREGRESS LISTNER");
+                                        }
+                                    })
+                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    dialog.dismiss();
+                                    ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+
+                                            finalUploadImageList.add(uri.toString());
+                                            // Log.d(TAG, "INSIDE THE ON SUCESS LISTNER" + finalUploadImageList);
+                                            try {
+                                                imagesList.setImagesList(finalUploadImageList);
+                                                post = new UserPost(
+                                                        register.getUserName(),
+                                                        register.getUserLevel(),
+                                                        Paper.book().read(Common.USER_IMAGE_LINK).toString(),
+                                                        id_user_upload_book_description.getText().toString(),
+                                                        "temp",
+                                                        String.valueOf(time),
+                                                        simpleDateFormat.format(calendar.getTime()),
+                                                        imagesList.getImagesList(),
+                                                        id_user_upload_book_name.getText().toString(),
+                                                        id_user_upload_book_author.getText().toString(),
+                                                        Paper.book().read(Common.USER_FINAL_NUMBER).toString());
+                                            } catch (Exception e) {
+                                                imagesList.setImagesList(finalUploadImageList);
+                                                post = new UserPost(
+                                                        register.getUserName(),
+                                                        register.getUserLevel(),
+                                                        "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png",
+                                                        id_user_upload_book_description.getText().toString(),
+                                                        "temp",
+                                                        String.valueOf(time),
+                                                        simpleDateFormat.format(calendar.getTime()),
+                                                        imagesList.getImagesList(),
+                                                        id_user_upload_book_name.getText().toString(),
+                                                        id_user_upload_book_author.getText().toString(),
+                                                        Paper.book().read(Common.USER_FINAL_NUMBER).toString(),
+                                                        user_selected_book_type);
+
+                                            }
+
+                                            referenceUploadBook.child(String.valueOf(time)).setValue(post);
+                                            referenceMyPost.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(String.valueOf(time)).setValue(post);
+                                            Toast.makeText(UploadActivity.this, "Image Uploaded Successfully.", Toast.LENGTH_SHORT).show();
+                                            btn_upload_book.setClickable(false);
+                                            btn_upload_book.setText("Done");
+                                            btn_upload_book.setVisibility(View.GONE);
+                                        }
+                                    });
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    dialog.dismiss();
+                                    // Log.d(TAG, "INSIDE THE FAILER LISTNER");
+                                }
+                            });
+                } catch (Exception e) {
+                    Log.e(TAG,Objects.requireNonNull(e.getMessage()));
+                }
+            }
+            dialog.show();
+        } else {
+            Toast.makeText(this, "You must need to upload at least 1 image.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void UploadUpdateStationary()
+    {
+
+    }
+
     @Override
     public void onBackPressed() {
         if(behavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
@@ -1005,6 +1192,123 @@ public class UploadActivity extends AppCompatActivity {
             }
         }
     }
+/*
+    private void UploadStaionary()
+    {
+        final ProgressDialog dialog = new ProgressDialog(this);
+        if (selectedUrls.size() > 0) {
+            final int time = (int) System.currentTimeMillis();
+            //Log.d(TAG, "INSIDE THE IF FUNCTION");
+            for (int i = 0; i < selectedUrls.size(); i++) {
+                try {
+                    //Log.d(TAG, "INSIDE THE FOR LOOP");
+                    final File finalImage = FileUtil.from(this, Uri.parse("file://" + selectedUrls.get(i)));
+                    Log.d(TAG, "selected images final list " + selectedUrls.get(i));
+                    File compressedImage = new Compressor(this)
+                            .setQuality(75)
+                            .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                            .compressToFile(finalImage);
+
+                    final StorageReference ref = referenceStorage.child("images/" + Paper.book().read(Common.USER_FINAL_NUMBER)).child(String.valueOf(System.currentTimeMillis()));
+                    ref.putFile(Uri.fromFile(compressedImage))
+                            .addOnProgressListener(
+                                    new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                                            try {
+                                                double progress = (100.00 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                                                dialog.setMessage("Loading : " + (float) progress + "%");
+                                                dialog.show();
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+
+                                            //Log.d(TAG, "INSIDE THE ON PREGRESS LISTNER");
+                                        }
+                                    })
+                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    dialog.dismiss();
+                                    ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+
+                                            finalUploadImageList.add(uri.toString());
+                                            // Log.d(TAG, "INSIDE THE ON SUCESS LISTNER" + finalUploadImageList);
+                                            try {
+                                                imagesList.setImagesList(finalUploadImageList);
+                                                post = new UserPost(
+                                                        register.getUserName(),
+                                                        register.getUserLevel(),
+                                                        Paper.book().read(Common.USER_IMAGE_LINK).toString(),
+                                                        id_user_upload_stationary_type.getText().toString(),
+                                                        "temp",
+                                                        String.valueOf(time),
+                                                        simpleDateFormat.format(calendar.getTime()),
+                                                        imagesList.getImagesList(),
+                                                        id_user_upload_book_name.getText().toString(),
+                                                        id_user_upload_book_author.getText().toString(),
+                                                        Paper.book().read(Common.USER_FINAL_NUMBER).toString());
+                                            } catch (Exception e) {
+                                                imagesList.setImagesList(finalUploadImageList);
+                                                post = new UserPost(
+                                                        register.getUserName(),
+                                                        register.getUserLevel(),
+                                                        "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png",
+                                                        id_user_upload_stationary_type.getText().toString(),
+                                                        "temp",
+                                                        String.valueOf(time),
+                                                        imagesList.getImagesList(),
+                                                        simpleDateFormat.format(calendar.getTime()),
+                                                        user_selected_book_type);
+
+                                            }
+
+                                            post = new UserPost(
+                                                    register.getUserName(),
+                                                    register.getUserLevel(),
+                                                    Paper.book().read(Common.USER_IMAGE_LINK).toString(),
+                                                    "temp",
+                                                    String.valueOf(time),
+                                                    simpleDateFormat.format(calendar.getTime()),
+                                                    imagesList.getImagesList(),
+                                                    simpleDateFormat.format(calendar.getTime()),
+                                                    user_selected_book_type);
+
+
+                                            referenceUploadBook.child(String.valueOf(time)).setValue(post);
+                                            referenceMyPost.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(String.valueOf(time)).setValue(post);
+                                            Toast.makeText(UploadActivity.this, "Image Uploaded Successfully.", Toast.LENGTH_SHORT).show();
+                                            btn_upload_book.setClickable(false);
+                                            btn_upload_book.setText("Done");
+                                            btn_upload_book.setVisibility(View.GONE);
+                                        }
+                                    });
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    dialog.dismiss();
+                                    // Log.d(TAG, "INSIDE THE FAILER LISTNER");
+                                }
+                            });
+                } catch (Exception e) {
+                    Log.e(TAG,Objects.requireNonNull(e.getMessage()));
+                }
+            }
+            dialog.show();
+        } else {
+            Toast.makeText(this, "You must need to upload at least 1 image.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void UpdateStationary()
+    {
+
+    }
+ */
 }
 
 

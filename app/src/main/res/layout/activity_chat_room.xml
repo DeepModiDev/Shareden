@@ -44,6 +44,7 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@+id/relative_laout_chat_room"
         tools:itemCount="20"
+        android:layout_marginBottom="55dp"
         tools:listitem="@layout/chat_view_holder_con" />
 
     <EditText
@@ -53,6 +54,7 @@
         android:hint="Message..."
         android:paddingLeft="10dp"
         android:layout_marginRight="50dp"
+        android:background="@drawable/btn_white_card"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -62,7 +64,7 @@
         android:layout_width="45dp"
         android:layout_height="45dp"
         app:srcCompat="@drawable/ic_send_white"
-        android:background="@android:color/transparent"
+        android:background="@drawable/btn_white_card"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/edit_text_enter_message" />

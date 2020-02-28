@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.deepmodi.shareden.Adapter.MessagesAdapter;
@@ -47,10 +48,11 @@ public class ChatRoom extends AppCompatActivity {
     private final List<Messages> messagesList = new ArrayList<>();
     EditText edit_text_enter_message;
     ImageButton btn_send;
-    String senderNumber,receiverNumber;
+    String senderNumber,receiverNumber,name;
     private UserChatConModel userChatConModel;
     private MessagesAdapter adapter;
     private RecyclerView recyclerView;
+    TextView text_view_userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,12 +62,13 @@ public class ChatRoom extends AppCompatActivity {
         Intent intent = getIntent();
         senderNumber = intent.getStringExtra("senderNumber");
         receiverNumber = intent.getStringExtra("receiverNumber");
-
+        name = intent.getStringExtra("userName");
         //recyclerView
         adapter = new MessagesAdapter(messagesList);
         recyclerView = findViewById(R.id.load_user_chat);
         recyclerView.smoothScrollToPosition(adapter.getItemCount());
         recyclerView.setAdapter(adapter);
+        text_view_userName = findViewById(R.id.text_view_userName);
 
         //Firebase init
         database = FirebaseDatabase.getInstance();
@@ -74,6 +77,7 @@ public class ChatRoom extends AppCompatActivity {
         edit_text_enter_message = findViewById(R.id.edit_text_enter_message);
         btn_send = findViewById(R.id.btn_send_message);
 
+        text_view_userName.setText(name);
         btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

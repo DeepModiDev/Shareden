@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -152,6 +153,10 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                     holder.user_book_description.setText(model.getUserBookDescription());
                     holder.user_book_name.setText(String.format("Book Name : %s", model.getUserBookName()));
                     holder.user_book_author.setText(String.format("Book Author : %s", model.getUserBookAuthor()));
+                    if(!TextUtils.isEmpty(model.getStationaryDetails()))
+                    {
+                        holder.id_stationary_detail.setText(model.getStationaryDetails());
+                    }
                     Picasso.get().load(model.getUserImg()).into(holder.profile_img);
                     //holder.setIsRecyclable(false);
                     /*

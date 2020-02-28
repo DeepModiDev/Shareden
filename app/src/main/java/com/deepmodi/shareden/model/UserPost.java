@@ -24,6 +24,18 @@ public class UserPost {
     public UserPost() {
     }
 
+    public UserPost(String userFullName,String userLevel,String userImg,String userBookDescription,String postId,String postTime,List<String> userUploadBookList,String selectedBookType)
+    {
+        this.userFullName = userFullName;
+        this.userLevel = userLevel;
+        this.userImg = userImg;
+        this.userBookDescription = userBookDescription;
+        this.postId = postId;
+        this.postTime = postTime;
+        this.userUploadBookList = userUploadBookList;
+        this.selectedBookType = selectedBookType;
+    }
+
     public UserPost(String userFullName, String userLevel, String userImg, String userBookDescription, String userFollowStatus) {
         this.userFullName = userFullName;
         this.userLevel = userLevel;
@@ -38,17 +50,6 @@ public class UserPost {
         this.userImg = userImg;
         this.userBookDescription = userBookDescription;
         this.userFollowStatus = userFollowStatus;
-        this.userUploadBookList = userUploadBookList;
-    }
-
-    public UserPost(String userFullName, String userLevel, String userImg, String userBookDescription, String userFollowStatus, String postId, String postTime, List<String> userUploadBookList) {
-        this.userFullName = userFullName;
-        this.userLevel = userLevel;
-        this.userImg = userImg;
-        this.userBookDescription = userBookDescription;
-        this.userFollowStatus = userFollowStatus;
-        this.postId = postId;
-        this.postTime = postTime;
         this.userUploadBookList = userUploadBookList;
     }
 
@@ -94,6 +95,26 @@ public class UserPost {
         this.selectedBookType = selectedBookType;
     }
 
+    public UserPost(String userFullName, String userLevel, String userImg, String userFollowStatus, String postId, String postTime, List<String> userUploadBookList, String userPhoneNumber, String selectedBookType, String stationaryDetails) {
+        this.userFullName = userFullName;
+        this.userLevel = userLevel;
+        this.userImg = userImg;
+        this.userFollowStatus = userFollowStatus;
+        this.postId = postId;
+        this.postTime = postTime;
+        this.userUploadBookList = userUploadBookList;
+        this.userPhoneNumber = userPhoneNumber;
+        this.selectedBookType = selectedBookType;
+        this.stationaryDetails = stationaryDetails;
+    }
+
+    public String getStationaryDetails() {
+        return stationaryDetails;
+    }
+
+    public void setStationaryDetails(String stationaryDetails) {
+        this.stationaryDetails = stationaryDetails;
+    }
 
     public String getUserPhoneNumber() {
         return userPhoneNumber;
