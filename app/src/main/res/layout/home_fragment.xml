@@ -83,6 +83,7 @@
             android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/app_bar_layout" />
 
+
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipe_referesh_home"
             android:layout_width="match_parent"
@@ -102,6 +103,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/suggestion_recyclerView" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottie_loading"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/app_bar_layout"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="loading_dino.json"
+            app:lottie_loop="true" />
 
         <ImageButton
             android:id="@+id/create_post"

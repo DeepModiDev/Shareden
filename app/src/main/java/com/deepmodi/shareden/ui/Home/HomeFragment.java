@@ -23,6 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
+import com.airbnb.lottie.LottieAnimationView;
 import com.deepmodi.shareden.Adapter.HomePostImageViewAdapter;
 import com.deepmodi.shareden.ChatActivity;
 import com.deepmodi.shareden.FullScreenImageView;
@@ -45,6 +47,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
+
 import io.paperdb.Paper;
 
 public class HomeFragment extends Fragment implements LifecycleOwner {
@@ -61,6 +66,7 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
     private NotificationHelper notificationHelper;
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private LottieAnimationView lottie_loading;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -99,6 +105,7 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
 
         RecyclerView suggestion_recyclerView = v.findViewById(R.id.suggestion_recyclerView);
         swipeRefreshLayout = v.findViewById(R.id.swipe_referesh_home);
+        lottie_loading = v.findViewById(R.id.lottie_loading);
 
         final ImageButton float_create_post = v.findViewById(R.id.create_post);
         RecyclerView.LayoutManager manager = new LinearLayoutManager(v.getContext());
@@ -148,11 +155,12 @@ public class HomeFragment extends Fragment implements LifecycleOwner {
                     = new FirebaseRecyclerAdapter<UserPost, LatestBookViewHolder>(options) {
                 @Override
                 protected void onBindViewHolder(@NonNull final LatestBookViewHolder holder, int position, @NonNull final UserPost model) {
+                    holder.user_book_name.setText(String.format("Book Name : %s", model.getUserBookName()));
+                    holder.user_book_author.setText(String.format("Book Author : %s", model.getUserBookAuthor()));
                     holder.user_name.setText(model.getUserFullName());
                     holder.user_level.setText(model.getUserLevel());
                     holder.user_book_description.setText(model.getUserBookDescription());
-                    holder.user_book_name.setText(String.format("Book Name : %s", model.getUserBookName()));
-                    holder.user_book_author.setText(String.format("Book Author : %s", model.getUserBookAuthor()));
+                    lottie_loading.setVisibility(View.GONE);
                     if(!TextUtils.isEmpty(model.getStationaryDetails()))
                     {
                         holder.id_stationary_detail.setText(model.getStationaryDetails());

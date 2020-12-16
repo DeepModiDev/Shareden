@@ -30,6 +30,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -161,7 +162,7 @@ public class UploadActivity extends AppCompatActivity {
     private SimpleDateFormat simpleDateFormat;
     private String bookId;
     private int p;
-    private UserPost post;
+    private UserPost post,stationaryPost;
     private MyPostView postView;
     private String user_selected_book_type;
     private BottomSheetDialog bottomSheetDialog;
@@ -169,6 +170,7 @@ public class UploadActivity extends AppCompatActivity {
     AppCompatSpinner spinner_select_book_level;
     File photoFile = null;
     private String capturedImagePath;
+    private String postStatus;
     public static final int CAMERA_REQUEST_CODE = 1234;
 
     @Override
@@ -343,12 +345,6 @@ public class UploadActivity extends AppCompatActivity {
                 /**
                  * Very Important function is above
                  */
-
-                if (intentGetInfo.getBooleanExtra("BookEnableId", false)) {
-                    UpdateUploadedBook();
-                } else {
-                    loadSelectedImages();
-                }
             }
         });
 
@@ -360,33 +356,45 @@ public class UploadActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 btn_upload_book.setVisibility(View.GONE);
-                if (!id_user_upload_book_name.getText().toString().isEmpty()) {
-                    if (!id_user_upload_book_author.getText().toString().isEmpty()) {
-
-                        if (!id_user_upload_book_description.getText().toString().isEmpty()) {
-                            if (intentGetInfo.getBooleanExtra("BookEnableId", false)) {
-                                //UpdateUploadedBook();
-                                UploadUpdatedBook();
+                if (postStatus.equals("want to Share book")) {
+                    if (!id_user_upload_book_name.getText().toString().isEmpty()) {
+                        if (!id_user_upload_book_author.getText().toString().isEmpty()) {
+                            if (!id_user_upload_book_description.getText().toString().isEmpty()) {
+                                if (intentGetInfo.getBooleanExtra("BookEnableId", false)) {
+                                    //UpdateUploadedBook();
+                                    UploadUpdatedBook();
+                                } else {
+                                    uploadBook();
+                                }
                             } else {
-                                uploadBook();
+                                id_user_upload_book_description.requestFocus();
+                                id_user_upload_book_description.setError("Please enter book description.");
                             }
                         } else {
-                            id_user_upload_book_description.requestFocus();
-                            id_user_upload_book_description.setError("Please enter book description.");
+                            id_user_upload_book_author.requestFocus();
+                            id_user_upload_book_author.setError("Please enter book author or publication name.");
                         }
                     } else {
-                        id_user_upload_book_author.requestFocus();
-                        id_user_upload_book_author.setError("Please enter book author or publication name.");
+                        id_user_upload_book_name.requestFocus();
+                        id_user_upload_book_name.setError("Please enter book name.");
                     }
-                } else {
-                    id_user_upload_book_name.requestFocus();
-                    id_user_upload_book_name.setError("Please enter book name.");
+
+                }
+                else
+                {
+                    if (intentGetInfo.getBooleanExtra("BookEnableId", false)) {
+                        //UpdateUploadedBook();
+                        //UploadUpdatedBook();
+                    } else {
+                        //UploadStationary();
+                    }
                 }
             }
         });
 
         loadUserInfo();
 
+        /*
         try {
             if (intentGetInfo.getBooleanExtra("BookEnableId", false)) {
                 UpdateUploadedBook();
@@ -396,9 +404,21 @@ public class UploadActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+         */
 
         SharingChooser(this);
+        try {
+            if( UploadAdapter!=null)
+            {
+                UploadAdapter.notifyDataSetChanged();
+            }
+            else{
 
+            }
+        }catch (Exception e)
+        {
+            Log.d("UploadActivity",e.getMessage());
+        }
     }
 
     //Methods for capture image and save images
@@ -527,6 +547,7 @@ public class UploadActivity extends AppCompatActivity {
         final ArrayList<String> imageUrls = FileSearch.getFilePaths(selectedDirectory, this);
         createPostRecyclerViewAdapter = new CreatePostRecyclerViewAdapter(imageUrls, appends, getSelectedListData(imageUrls.size()), galleryImageView, UploadActivity.this, progressBar, finalSendList);
         create_post_grid_recyclerView.setAdapter(createPostRecyclerViewAdapter);
+        createPostRecyclerViewAdapter.notifyDataSetChanged();
         try {
             if (imageUrls.size() > 0) {
                 setImage(imageUrls.get(0), galleryImageView, "file://");
@@ -563,6 +584,13 @@ public class UploadActivity extends AppCompatActivity {
 
     private void loadSelectedImages() {
         UploadAdapter = new UploadImageRecyclerViewAdapter(selectedUrls, UploadActivity.this);
+        recyclerView_selected_img.setAdapter(UploadAdapter);
+        UploadAdapter.notifyDataSetChanged();
+    }
+
+    private void loadStationaryImages()
+    {
+        UploadAdapter = new UploadImageRecyclerViewAdapter(selectedUrls,UploadActivity.this);
         recyclerView_selected_img.setAdapter(UploadAdapter);
         UploadAdapter.notifyDataSetChanged();
     }
@@ -1018,13 +1046,25 @@ public class UploadActivity extends AppCompatActivity {
                      id_user_upload_book_author.setVisibility(View.VISIBLE);
                      id_user_upload_book_description.setVisibility(View.VISIBLE);
                      id_user_upload_stationary_type.setVisibility(View.GONE);
+                    postStatus = "want to Share book";
+                    if (intentGetInfo.getBooleanExtra("BookEnableId", false)) {
+                        UpdateUploadedBook();
+                    } else {
+                        loadSelectedImages();
+                    }
                 }else if(sequences[which].equals("want to share Stationary"))
                 {
                     id_user_upload_book_name.setVisibility(View.GONE);
                     id_user_upload_book_author.setVisibility(View.GONE);
-                    id_user_upload_book_description.setVisibility(View.GONE);
-                    id_user_upload_stationary_type.setVisibility(View.VISIBLE);
+                    id_user_upload_book_description.setVisibility(View.VISIBLE);
+                    id_user_upload_stationary_type.setVisibility(View.GONE);
                     spinner_select_book_level.setVisibility(View.GONE);
+                    postStatus = "want to share Stationary";
+                    if (intentGetInfo.getBooleanExtra("BookEnableId", false)) {
+                        //UpdateUploadedBook();
+                    } else {
+                        loadStationaryImages();
+                    }
                     dialog.dismiss();
                 }
             }
@@ -1050,9 +1090,6 @@ public class UploadActivity extends AppCompatActivity {
             Log.e(TAG, "Camera data is null");
         }
     }
-
-
-
 
 
     private void UploadStationary(){
@@ -1099,38 +1136,31 @@ public class UploadActivity extends AppCompatActivity {
                                             // Log.d(TAG, "INSIDE THE ON SUCESS LISTNER" + finalUploadImageList);
                                             try {
                                                 imagesList.setImagesList(finalUploadImageList);
-                                                post = new UserPost(
+                                                stationaryPost = new UserPost(
                                                         register.getUserName(),
                                                         register.getUserLevel(),
                                                         Paper.book().read(Common.USER_IMAGE_LINK).toString(),
                                                         id_user_upload_book_description.getText().toString(),
-                                                        "temp",
                                                         String.valueOf(time),
                                                         simpleDateFormat.format(calendar.getTime()),
                                                         imagesList.getImagesList(),
-                                                        id_user_upload_book_name.getText().toString(),
-                                                        id_user_upload_book_author.getText().toString(),
-                                                        Paper.book().read(Common.USER_FINAL_NUMBER).toString());
+                                                        user_selected_book_type);
                                             } catch (Exception e) {
                                                 imagesList.setImagesList(finalUploadImageList);
-                                                post = new UserPost(
+                                                stationaryPost = new UserPost(
                                                         register.getUserName(),
                                                         register.getUserLevel(),
                                                         "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png",
                                                         id_user_upload_book_description.getText().toString(),
-                                                        "temp",
                                                         String.valueOf(time),
                                                         simpleDateFormat.format(calendar.getTime()),
                                                         imagesList.getImagesList(),
-                                                        id_user_upload_book_name.getText().toString(),
-                                                        id_user_upload_book_author.getText().toString(),
-                                                        Paper.book().read(Common.USER_FINAL_NUMBER).toString(),
                                                         user_selected_book_type);
 
                                             }
 
-                                            referenceUploadBook.child(String.valueOf(time)).setValue(post);
-                                            referenceMyPost.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(String.valueOf(time)).setValue(post);
+                                            referenceUploadBook.child(String.valueOf(time)).setValue(stationaryPost);
+                                            referenceMyPost.child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(String.valueOf(time)).setValue(stationaryPost);
                                             Toast.makeText(UploadActivity.this, "Image Uploaded Successfully.", Toast.LENGTH_SHORT).show();
                                             btn_upload_book.setClickable(false);
                                             btn_upload_book.setText("Done");
@@ -1192,7 +1222,8 @@ public class UploadActivity extends AppCompatActivity {
             }
         }
     }
-/*
+
+    /*
     private void UploadStaionary()
     {
         final ProgressDialog dialog = new ProgressDialog(this);

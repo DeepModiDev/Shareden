@@ -30,6 +30,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +44,7 @@ import com.deepmodi.shareden.EditProfileAcivity;
 import com.deepmodi.shareden.EditUserActivity;
 import com.deepmodi.shareden.HomeActivity;
 import com.deepmodi.shareden.Interface.UploadItemClickListner;
+import com.deepmodi.shareden.MainActivity;
 import com.deepmodi.shareden.R;
 import com.deepmodi.shareden.UploadActivity;
 import com.deepmodi.shareden.ViewHolder.MyPostViewHolder;
@@ -97,6 +99,7 @@ public class MyAccountFragment extends Fragment implements LifecycleOwner
         private List<String> myIds = new ArrayList<>();
         private List<UserPost> post = new ArrayList<>();
         UserRegisterClass updatedRegister;
+        private Button btn_sign_out;
         private TextView follower_textView,following_textView,requests_textView,number_of_books_donated;
 
     public static MyAccountFragment newInstance() {
@@ -113,6 +116,20 @@ public class MyAccountFragment extends Fragment implements LifecycleOwner
         updatedRegister = new UserRegisterClass();
 
         number_of_books_donated = view.findViewById(R.id.number_of_books_donated);
+
+        btn_sign_out = view.findViewById(R.id.btn_sign_out);
+        btn_sign_out.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Paper.book().delete(Common.USER_FINAL_NUMBER);
+                Paper.book().delete(Common.USER_FINAL_PASSWORD);
+
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+            }
+        });
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         reference = database.getReference("Users").child((String)Paper.book().read(Common.USER_FINAL_NUMBER));
@@ -262,7 +279,7 @@ public class MyAccountFragment extends Fragment implements LifecycleOwner
                    assert updatedRegister != null;
                    if(updatedRegister.getUserImg()!=null)
                    {
-                       Picasso.get().load(updatedRegister.getUserImg()).placeholder(R.drawable.usr_img).into(profile_img);
+                       Picasso.get().load(Paper.book().read(Common.USER_IMAGE_LINK).toString()).placeholder(R.drawable.usr_img).into(profile_img);
                        Paper.book().write(Common.USER_IMAGE_LINK,updatedRegister.getUserImg());
                    }
                    //Log.d("MyAccountMessage","Message :"+register.getUserName()+register.getUserImg());
@@ -409,7 +426,7 @@ public class MyAccountFragment extends Fragment implements LifecycleOwner
             }
         });
 
-        FirebaseDatabase.getInstance().getReference("MyPost").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("Donated").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 number_of_books_donated.setText(String.valueOf(dataSnapshot.getChildrenCount())+" books donated");

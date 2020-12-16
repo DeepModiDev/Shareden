@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -22,12 +23,16 @@ import com.deepmodi.shareden.UploadActivity;
 import com.deepmodi.shareden.ViewHolder.MyPostViewHolder;
 import com.deepmodi.shareden.common.Common;
 import com.deepmodi.shareden.model.MyPostView;
+import com.deepmodi.shareden.model.UserPost;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -105,6 +110,27 @@ public class MyPostFragment extends Fragment {
                     Picasso.get().load(model.getUserImg()).error(R.mipmap.ic_launcher).into(holder.my_post_profile_img);
                     holder.my_post_user_level.setText(model.getUserLevel());
                     homePostImageViewAdapter = new HomePostImageViewAdapter(getContext(),model.getUserUploadBookList());
+
+                    FirebaseDatabase.getInstance().getReference("Donated").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(model.getPostId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            try {
+                                UserPost userPost = dataSnapshot.getValue(UserPost.class);
+                                if(userPost.getBookStatus().equals("donated"))
+                                {
+                                    holder.my_view_donated.setVisibility(View.VISIBLE);
+                                }
+                            }catch (Exception e)
+                            {
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                     holder.user_edit_btn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(final View v) {
@@ -169,6 +195,14 @@ public class MyPostFragment extends Fragment {
                                             intent.putStringArrayListExtra("superImageList", (ArrayList<String>) model.getUserUploadBookList());
                                             startActivity(intent);
                                             break;
+                                        case R.id.item_donated:
+                                            FirebaseDatabase.getInstance().getReference("Donated").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(model.getPostId()).setValue(model);
+                                            //FirebaseDatabase.getInstance().getReference("MyPost").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child("Donated").child(model.getPostId()).setValue(model);
+                                            FirebaseDatabase.getInstance().getReference("Donated").child(Paper.book().read(Common.USER_FINAL_NUMBER).toString()).child(model.getPostId()).child("bookStatus").setValue("donated");
+
+
+                                           //FirebaseDatabase.getInstance().getReference("UserPost").child(model.getPostId()).removeValue();
+                                           break;
                                     }
                                     return false;
                                 }

@@ -18,6 +18,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.airbnb.lottie.LottieAnimationView;
 import com.deepmodi.shareden.common.Common;
 import com.deepmodi.shareden.model.UserRegisterClass;
 import com.google.firebase.database.DataSnapshot;
@@ -35,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     UserRegisterClass register;
     TextView textView;
     Button btn_retry;
-    ImageView imageView;
+    LottieAnimationView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +46,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar_splash = findViewById(R.id.toolbar_splash);
         setSupportActionBar(toolbar_splash);
 
-        imageView = findViewById(R.id.splash_logo);
-        Animation animation = AnimationUtils.loadAnimation(this,R.anim.fade_in);
-        imageView.setAnimation(animation);
-        animation.start();
+        imageView = findViewById(R.id.animation_view);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
@@ -63,12 +62,18 @@ public class MainActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance();
         reference = database.getReference("Users");
-        if (Common.checkInternetConnenction(this)) {
-            checkUserExistance();
-        } else {
-            textView.setVisibility(View.VISIBLE);
-            btn_retry.setVisibility(View.VISIBLE);
-        }
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (Common.checkInternetConnenction(MainActivity.this)) {
+                    checkUserExistance();
+                } else {
+                    textView.setVisibility(View.VISIBLE);
+                    btn_retry.setVisibility(View.VISIBLE);
+                }
+            }
+        },3000);
 
         btn_retry.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+
     }
 
     private void checkUserExistance() {
@@ -88,11 +94,13 @@ public class MainActivity extends AppCompatActivity {
                     assert register != null;
                     if (register.getUserId().equals(Paper.book().read(Common.USER_AUTH_ID))) {
                         Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                        startActivityForResult(intent,110);
+                        startActivity(intent);
+                        finish();
                     }
                 } catch (Exception e) {
                     Intent intent = new Intent(MainActivity.this, LogInActivity.class);
-                    startActivityForResult(intent,110);
+                    startActivity(intent);
+                    finish();
                 }
             }
 
@@ -106,9 +114,5 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 110 && resultCode == 110)
-        {
-            this.finish();
-        }
     }
 }

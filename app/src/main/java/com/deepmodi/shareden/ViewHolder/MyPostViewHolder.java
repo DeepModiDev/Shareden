@@ -33,6 +33,7 @@ public class MyPostViewHolder extends RecyclerView.ViewHolder {
     public TextView my_post_time;
     public Button user_edit_btn;
     public RecyclerView my_post_home_images_recyclerView;
+    public TextView my_view_donated;
 
     public MyPostViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -44,7 +45,7 @@ public class MyPostViewHolder extends RecyclerView.ViewHolder {
         my_post_time = itemView.findViewById(R.id.id_my_post_time);
         user_edit_btn = itemView.findViewById(R.id.btn_edit_post);
         my_post_book_author = itemView.findViewById(R.id.id_my_post_book_author);
-
+        my_view_donated = itemView.findViewById(R.id.text_view_donated);
         my_post_home_images_recyclerView = itemView.findViewById(R.id.my_post_home_images_recyclerView);
 
 

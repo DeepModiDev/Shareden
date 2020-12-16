@@ -19,7 +19,16 @@ public class UserPost {
     private String userPhoneNumber;
     private String selectedBookType;
     private String stationaryDetails;
+    private String bookStatus;
 
+
+    public String getBookStatus() {
+        return bookStatus;
+    }
+
+    public void setBookStatus(String bookStatus) {
+        this.bookStatus = bookStatus;
+    }
 
     public UserPost() {
     }

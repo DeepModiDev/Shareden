@@ -34,7 +34,6 @@ public class LatestBookViewHolder extends RecyclerView.ViewHolder {
         user_level = itemView.findViewById(R.id.id_user_level);
         recyclerView = itemView.findViewById(R.id.post_home_images_recyclerView);
         post_time = itemView.findViewById(R.id.id_post_time);
-        id_stationary_detail = itemView.findViewById(R.id.id_stationary_detail);
         recyclerView.setHasFixedSize(true);
     }
 
